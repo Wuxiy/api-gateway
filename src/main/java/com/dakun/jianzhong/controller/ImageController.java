@@ -1,0 +1,177 @@
+package com.dakun.jianzhong.controller;
+
+import com.dakun.jianzhong.service.qiniu.QiniuConstant;
+import com.dakun.jianzhong.service.qiniu.QiniuFile;
+import com.dakun.jianzhong.utils.MD5;
+import com.dakun.jianzhong.utils.Result;
+import com.dakun.jianzhong.utils.ResultGenerator;
+import com.qiniu.util.StringMap;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * Created by wangh09 on 2017/7/24.
+ */
+@RestController
+@RequestMapping("/images")
+public class ImageController {
+    @GetMapping("/upload-token")
+    public Result detail() {
+        StringMap putPolicy = new StringMap().putNotEmpty("returnBody",
+                "{\"key\": $(key),\"ext\":$(ext)}");
+        String token = QiniuFile.getuploadtoken(QiniuConstant.resources_bucket,putPolicy);
+        return ResultGenerator.genSuccessResult(token);
+    }
+
+    //用于网页获取小图片地址
+    @GetMapping("/getspicurl")
+    public Result getpicurl(@RequestParam(required = true) String bucket,@RequestParam(required = true) String key) {
+        try {
+            String domain="";
+            switch (bucket){
+                case QiniuConstant.bucket_account:
+                    domain = QiniuConstant.Domain_account;
+                    break;
+                case QiniuConstant.bucket_product:
+                    domain = QiniuConstant.Domain_product;
+                    break;
+                case QiniuConstant.bucket_social:
+                    domain = QiniuConstant.Domain_social;
+                    break;
+                case QiniuConstant.resources_bucket:
+                    domain = QiniuConstant.resources_host;
+                    break;
+            };
+            return ResultGenerator.genSuccessResult(QiniuFile.getdownloadurl(domain, key,
+                    "?imageView2/2/h/200", QiniuConstant.portrait_download_webpage_exp));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultGenerator.genFailResult(e.getCause().getMessage());
+        }
+    }
+
+    //获取上传token
+    //bucket:account,resources,social,product
+    @RequestMapping(value = "/getuploadtoken", method = RequestMethod.GET)
+    public Result uploadprepare(@RequestParam(value = "key") String key,@RequestParam(value = "bucket") String bucket,@RequestParam(value = "type") Integer type) {
+
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            String md5 = "";
+            String fileName = "";
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");// 小写的mm表示的是分钟
+            String localtime = sdf.format(date);
+            switch (type) {
+                /**************基本信息部分**************/
+                //0:头像
+                case 0:
+                    fileName = "user/portrait/";
+                    break;
+
+                /**************专家部分**************/
+                //1：身份证正面；2：身份证背面；3：证件
+                case 1:
+                    fileName = "expert/idfront/";
+                    break;
+                case 2:
+                    fileName = "expert/idback/";
+                    break;
+                case 3:
+                    fileName = "expert/credential/";
+                    break;
+
+                /**************经销商部分**************/
+                //4：身份证正面；5：身份证背面；6：营业执照；7：店铺照片
+                case 4:
+                    fileName = "dealer/idfront/";
+                    break;
+                case 5:
+                    fileName = "dealer/idback/";
+                    break;
+                case 6:
+                    fileName = "dealer/lisense/";
+                    break;
+                case 7:
+                    fileName = "dealer/shopphoto/";
+                    break;
+
+                /************作物部分*****************/
+                /**
+                 *30:作物图片,31:作物种类图片,32:虫害图片,33：虫害虫态图片
+                 *34：病害图片,35：缺素症图片，36：生物协迫图片
+                 * 37：草害图片
+                */
+                case 30:
+                    fileName = "crop/picture/";
+                    break;
+                case 31:
+                    fileName = "crop/catalog/picture/";
+                    break;
+                case 32:
+                    fileName = "pest/harmpic/";
+                    break;
+                case 33:
+                    fileName = "pest/pestpic/";
+                case 34:
+                    fileName = "crop/disease/";
+                    break;
+                case 35:
+                    fileName = "crop/deficiency/";
+                    break;
+                case 36:
+                    fileName = "crop/threat/";
+                    break;
+                case 37:
+                    fileName = "crop/grass/";
+                    break;
+                    /*************文章部门********/
+                    // 8：文章主图片
+                case 8:
+                    fileName = "article/mainpic/";
+                    break;
+                default:
+                    return ResultGenerator.genFailResult("wrong code!");
+            }
+            fileName += MD5.getMD5String(localtime + key);
+            result.put("key", fileName);
+            StringMap putPolicy = new StringMap()
+                    .putNotEmpty("returnBody",
+                            "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
+            putPolicy.putNotEmpty("persistentOps",
+                    "imageMogr2/thumbnail/800*800");
+            result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultGenerator.genFailResult(e.getCause().getMessage());
+        }
+        return ResultGenerator.genSuccessResult(result);
+    }
+
+    //admin前端ueditor组件获取配置信息
+    @RequestMapping(value = "/controller.action", method = RequestMethod.GET)
+    public Result controller(@RequestParam(value = "action") String action){
+        String imageUrl =  "http://up-z1.qiniu.com/";
+        Map<String, Object> result = new HashMap<String, Object>();
+        switch (action){
+            case "config":
+                String[] strings = {".jpg",".png",".jpeg",".gif",".bmp"};
+                List<String> imgTypeList = Arrays.asList(strings);
+                result.put("imageUrl",imageUrl);
+                result.put("imageActionName", "uploadimage");
+                result.put("imageFieldName", "file");
+                result.put("imageMaxSize", "2048000");
+                result.put("imageAllowFiles", imgTypeList);
+                result.put("imageUrlPrefix", "http://otpbyg9fz.bkt.clouddn.com/");
+                break;
+            case "uploadimage":
+                result.put("imageUrl",imageUrl);
+                break;
+
+        }
+        return ResultGenerator.genSuccessResult(result);
+    }
+
+}
