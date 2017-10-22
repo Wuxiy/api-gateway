@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration packagingData="true">
-    <contextName>nongyequan-server</contextName>
+    <contextName>jianzhong-server</contextName>
     <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
     <if condition='isDefined("root.dir")'>
         <then>
@@ -19,12 +19,12 @@
         </encoder>
     </appender>
     <appender name="infoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/nongyequan-server.INFO</file>
+        <file>${LOG_HOME}/jianzhong-server.INFO</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/nongyequan-server.%d{yyyy-MM-dd}.INFO</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/jianzhong-server.%d{yyyy-MM-dd}.INFO</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -32,14 +32,14 @@
         </encoder>
     </appender>
     <appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/nongyequan-server.ERROR</file>
+        <file>${LOG_HOME}/jianzhong-server.ERROR</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/nongyequan-server.%d{yyyy-MM-dd}.ERROR</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/jianzhong-server.%d{yyyy-MM-dd}.ERROR</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -47,14 +47,14 @@
         </encoder>
     </appender>
     <appender name="debugLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/nongyequan-server.DEBUG</file>
+        <file>${LOG_HOME}/jianzhong-server.DEBUG</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>DEBUG</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/nongyequan-server.%d{yyyy-MM-dd}.DEBUG</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/jianzhong-server.%d{yyyy-MM-dd}.DEBUG</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -73,6 +73,6 @@
     </root>
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
 
-    <logger name="com.dakun.nongyequan" level="DEBUG"/>
+    <logger name="com.dakun.jianzhong" level="DEBUG"/>
 
 </configuration>

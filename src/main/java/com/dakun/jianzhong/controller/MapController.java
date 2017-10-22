@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  * Created by hexingfu on 2017/9/13.
  */
 @RestController
-@RequestMapping("/remove-me/map-service/baidu-map")
+@RequestMapping("/map-service/baidu-map")
 public class MapController {
     @Resource
     BaiduLBSService baiduLBSService;
