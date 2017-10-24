@@ -9,13 +9,11 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <repositories>
-        <repository>
-            <id>private-maven</id>
-            <name>Private Maven repository</name>
-            <url>http://192.168.50.100:8081/repository/3rd-party</url>
-        </repository>
-    </repositories>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.1.RELEASE</version>
+    </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,11 +25,6 @@
         <mybatis.jsr310.version>1.0.2</mybatis.jsr310.version>
     </properties>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.1.RELEASE</version>
-    </parent>
     <build>
         <plugins>
             <plugin>
