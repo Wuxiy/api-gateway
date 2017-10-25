@@ -29,7 +29,7 @@ public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-    /*@Bean
+    @Bean
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
@@ -46,7 +46,7 @@ public class Application {
         config.addAllowedMethod("POST");
         config.addAllowedMethod("DELETE");
         config.addAllowedMethod("PATCH");
-        source.registerCorsConfiguration("*//**", config);
+        source.registerCorsConfiguration("*", config);
         return new CorsFilter(source);
     }
     @Bean
@@ -56,5 +56,5 @@ public class Application {
     @Bean
     public PostFilter postFilter() {
         return new PostFilter();
-    }*/
+    }
 }
