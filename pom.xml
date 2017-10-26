@@ -9,6 +9,14 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>private-maven</id>
+            <name>Private Maven repository</name>
+            <url>http://192.168.50.100:8081/repository/3rd-party</url>
+        </repository>
+    </repositories>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
