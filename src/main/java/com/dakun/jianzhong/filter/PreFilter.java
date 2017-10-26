@@ -87,7 +87,7 @@ public class PreFilter extends ZuulFilter {
                         builder.append(enumerator.nextElement());
                     }
                     String imageType = builder.toString();
-                    String downloadURL = QiniuFile.getdownloadurl(QiniuConstant.resources_host,fileName,imageType,QiniuConstant.portrait_download_app_exp);
+                    String downloadURL = QiniuFile.getdownloadurl(QiniuConstant.Domain_resources,fileName,imageType,QiniuConstant.portrait_download_app_exp);
                     Map<String,List<String>> qp = new HashMap<String, List<String>>();
                     String paramsPairs = downloadURL.split("\\?")[1];
                     String[] params = paramsPairs.split("&");
