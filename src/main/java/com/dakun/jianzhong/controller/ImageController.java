@@ -55,7 +55,8 @@ public class ImageController {
     //获取上传token
     //bucket:account,resources,social,product
      @RequestMapping(value = "/getuploadtoken", method = RequestMethod.GET)
-    public Result uploadprepare(@RequestParam(value = "key") String key,@RequestParam(value = "bucket") String bucket,@RequestParam(value = "type") Integer type) {
+    public Result uploadprepare(@RequestParam(value = "key") String key,@RequestParam(value = "bucket") String bucket,@RequestParam(value = "type") Integer type)
+    {
         if(key==null || bucket==null || type==null){
             return ResultGenerator.genFailResult("parameter error");
         }
@@ -71,7 +72,6 @@ public class ImageController {
         }
         return ResultGenerator.genSuccessResult(rs);
     }
-
 
     private Map<String,Object> genToken(String key,String bucket,Integer type){
         Map<String, Object> result = new HashMap<String, Object>();

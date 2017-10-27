@@ -21,11 +21,9 @@ import java.util.Map;
  */
 @Service
 public class BaiduLBSService {
-    @Resource
-    private RestTemplate restTemplate;
+    private RestTemplate restTemplate = new RestTemplate();
     public String createQALBSLocation(double longitude, double latitude, String title) {
         String baiduId = getQALBSLocationId(longitude,latitude,title);
-
         return baiduId;
     }
     public String getQALBSLocationId(double longitude, double latitude, String title) {
