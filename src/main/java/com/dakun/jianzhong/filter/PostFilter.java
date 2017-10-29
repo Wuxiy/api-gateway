@@ -92,7 +92,7 @@ public class PostFilter extends ZuulFilter {
                         }
                         ctx.setResponseBody(JSON.toJSONString(response));
                     } catch (IOException e) {
-                        JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"签名失败\"}");
+                        JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"签名失败!\"}");
                         ctx.setResponseBody(jb.toString());
                         e.printStackTrace();
                     }
