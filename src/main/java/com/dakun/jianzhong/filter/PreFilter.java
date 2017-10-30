@@ -187,12 +187,12 @@ public class PreFilter extends ZuulFilter {
                         try {
                             String deviceIdParam = request.getHeader("deviceId");
                             //如果是网站来源
-                            if (!"websource".equals(deviceIdParam)) {
+                            if ("websource".equals(deviceIdParam)) {
                                 Claims claim = JWTUtils.parseJWT(jwt);
                                 ctx.addZuulRequestHeader("adminId", claim.getId());
                                 JSONObject object = JSONObject.parseObject(claim.getSubject());
                                 ctx.addZuulRequestHeader("usertype", object.getString("role"));
-                            }else {
+                            } else {
                                 Claims claim = JWTUtils.parseJWT(jwt);
                                 System.out.println("accountId:" + claim.getId());
                                 System.out.println("subject:" + claim.getSubject());
