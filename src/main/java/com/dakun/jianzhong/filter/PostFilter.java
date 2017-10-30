@@ -90,6 +90,7 @@ public class PostFilter extends ZuulFilter {
                             String jwt = JWTUtils.createJWT(idStr,"{\""+"role\":"+role+",\"deviceId\":\"websource\"}", -1);
                             response.put("accessToken", jwt);
                         }
+                        ctx.addZuulResponseHeader("Access-Control-Allow-Origin","*");
                         ctx.setResponseBody(JSON.toJSONString(response));
                     } catch (IOException e) {
                         JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"签名失败\"}");

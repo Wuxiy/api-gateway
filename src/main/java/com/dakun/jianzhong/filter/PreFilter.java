@@ -188,7 +188,7 @@ public class PreFilter extends ZuulFilter {
                         try {
                             String deviceIdParam = request.getHeader("deviceId");
                             //如果是网站来源
-                            if (!"websource".equals(deviceIdParam)) {
+                            if ("websource".equals(deviceIdParam)) {
                                 Claims claim = JWTUtils.parseJWT(jwt);
                                 ctx.addZuulRequestHeader("adminId", claim.getId());
                                 JSONObject object = JSONObject.parseObject(claim.getSubject());
