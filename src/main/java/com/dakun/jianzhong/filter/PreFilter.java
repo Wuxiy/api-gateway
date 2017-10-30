@@ -143,7 +143,6 @@ public class PreFilter extends ZuulFilter {
                 redisTemplate.delete(redisKey);
                 return null;
             } else if (uri.equals("/account-service/admin/login")) {
-                ctx.addZuulResponseHeader("Access-Control-Allow-Origin","*");
                 return null;
             }
             //*************************************处理权限
@@ -193,7 +192,7 @@ public class PreFilter extends ZuulFilter {
                                 ctx.addZuulRequestHeader("adminId", claim.getId());
                                 JSONObject object = JSONObject.parseObject(claim.getSubject());
                                 ctx.addZuulRequestHeader("usertype", object.getString("role"));
-                            }else {
+                            } else {
                                 Claims claim = JWTUtils.parseJWT(jwt);
                                 System.out.println("accountId:" + claim.getId());
                                 System.out.println("subject:" + claim.getSubject());
