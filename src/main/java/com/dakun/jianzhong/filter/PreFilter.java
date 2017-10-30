@@ -143,6 +143,7 @@ public class PreFilter extends ZuulFilter {
                 redisTemplate.delete(redisKey);
                 return null;
             } else if (uri.equals("/account-service/admin/login")) {
+                ctx.addZuulResponseHeader("Access-Control-Allow-Origin","*");
                 return null;
             }
             //*************************************处理权限
