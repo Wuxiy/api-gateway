@@ -19,6 +19,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -173,7 +174,7 @@ public class PreFilter extends ZuulFilter {
             } else {
                 //API 存在，而且不公开
                 if (!(Boolean) data.get(0).get("isPublic")) {
-                    String jwt = request.getHeader("Access-Token");
+                    String jwt = getToken(request);
                     //没有jwt
                     if (jwt == null) {
                         ctx.setSendZuulResponse(false);
@@ -185,7 +186,7 @@ public class PreFilter extends ZuulFilter {
                         ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
                     } else {
                         try {
-                            String deviceIdParam = request.getHeader("deviceId");
+                            String deviceIdParam = getDeviceId(request);
                             //如果是网站来源
                             if ("websource".equals(deviceIdParam)) {
                                 Claims claim = JWTUtils.parseJWT(jwt);
@@ -230,5 +231,21 @@ public class PreFilter extends ZuulFilter {
             ctx.setResponseStatusCode(500);
             return null;
         }
+    }
+
+    private String getDeviceId(HttpServletRequest request) {
+        String deviceId = request.getHeader("deviceId");
+        if (StringUtils.isEmpty(deviceId)) {
+            return request.getParameter("deviceId");
+        }
+        return deviceId;
+    }
+
+    private String getToken(HttpServletRequest request) {
+        String jwt = request.getHeader("Access-Token");
+        if (StringUtils.isEmpty(jwt)) {
+            return request.getParameter("token");
+        }
+        return jwt;
     }
 }
