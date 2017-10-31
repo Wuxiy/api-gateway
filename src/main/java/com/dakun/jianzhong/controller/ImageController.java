@@ -144,6 +144,21 @@ public class ImageController {
                 case 37:
                     fileName = "crop/grass/";
                     break;
+                case 40:
+                    fileName = "product/product/";
+                    break;
+                case 41:
+                    fileName = "product/trademark/";
+                    break;
+                case 42:
+                    fileName = "product/license/";
+                    break;
+                case 43:
+                    fileName = "product/approve/";
+                    break;
+                case 44:
+                    fileName = "product/standard/";
+                    break;
                 /*************文章部门********/
                 // 8：文章主图片
                 case 8:
