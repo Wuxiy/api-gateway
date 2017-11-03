@@ -12,8 +12,8 @@ public class QiniuConstant {
 	public static final String Domain_product = "ou4aprp8u.bkt.clouddn.com";
 
 
-	public static final String resources_bucket = "resources";
-	public static final String resources_host = "otljp6sqv.bkt.clouddn.com";
+	public static final String bucket_resources = "resources";
+	public static final String Domain_resources = "otljp6sqv.bkt.clouddn.com";
 
     public static final String bucket_articleresource = "articleresource";
     public static final String Domain_articleresource = "ovhglgz8o.bkt.clouddn.com";
