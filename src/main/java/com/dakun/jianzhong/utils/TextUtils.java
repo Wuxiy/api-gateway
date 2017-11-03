@@ -101,7 +101,7 @@ public class TextUtils {
         StringBuilder stringBuilder = new StringBuilder();
         String[] imageFileNames = images.split(";");
         for (String image : imageFileNames) {
-            stringBuilder.append(QiniuFile.getdownloadurl(QiniuConstant.resources_host,image,null,QiniuConstant.portrait_download_app_exp)).append(";");
+            stringBuilder.append(QiniuFile.getdownloadurl(QiniuConstant.Domain_resources,image,null,QiniuConstant.portrait_download_app_exp)).append(";");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
         return stringBuilder.toString();

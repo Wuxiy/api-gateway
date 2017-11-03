@@ -75,6 +75,30 @@ public class PostFilter extends ZuulFilter {
                     return null;
                 }
                 return null;
+            }else  if (uri.equals("/account-service/admin/login")) {
+                if (ctx.getResponseStatusCode() == 200) {
+                    try (final InputStream responseDataStream = ctx.getResponseDataStream()) {
+                        Map<String,Object> response = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")),Map.class);
+                        if ((Integer) response.get("status") == 200) {
+                            Map<String, Object> admin = (Map<String, Object>) response.get("data");
+                            //暂时无角色划分
+                            //String role = account.get("usertype").toString();
+                            String role = "1";
+                            Integer id = (Integer) admin.get("id");
+                            String idStr = String.valueOf(id);
+                            if (id == null) idStr = "wrong";
+                            String jwt = JWTUtils.createJWT(idStr,"{\""+"role\":"+role+",\"deviceId\":\"websource\"}", -1);
+                            response.put("accessToken", jwt);
+                        }
+                        ctx.setResponseBody(JSON.toJSONString(response));
+                    } catch (IOException e) {
+                        JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"签名失败!\"}");
+                        ctx.setResponseBody(jb.toString());
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+                return null;
             }
             return null;
         } catch (Exception e) {
