@@ -1,6 +1,6 @@
 package com.dakun.jianzhong.service.qiniu;
 
-public class QiniuConstant {
+public class QiniuConstant{
 
 	public static final String bucket_account = "account";
 	public static final String Domain_account = "otpbyg9fz.bkt.clouddn.com";
