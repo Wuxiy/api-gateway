@@ -21,7 +21,7 @@ public class ImageController {
     public Result detail() {
         StringMap putPolicy = new StringMap().putNotEmpty("returnBody",
                 "{\"key\": $(key),\"ext\":$(ext)}");
-        String token = QiniuFile.getuploadtoken(QiniuConstant.resources_bucket,putPolicy);
+        String token = QiniuFile.getuploadtoken(QiniuConstant.bucket_resources,putPolicy);
         return ResultGenerator.genSuccessResult(token);
     }
 
@@ -40,9 +40,14 @@ public class ImageController {
                 case QiniuConstant.bucket_social:
                     domain = QiniuConstant.Domain_social;
                     break;
-                case QiniuConstant.resources_bucket:
-                    domain = QiniuConstant.resources_host;
+                case QiniuConstant.bucket_resources:
+                    domain = QiniuConstant.Domain_resources;
                     break;
+                case QiniuConstant.bucket_articleresource:
+                    domain = QiniuConstant.Domain_articleresource;
+                    break;
+                default:
+                    return ResultGenerator.genFailResult("bucket未找到");
             };
             return ResultGenerator.genSuccessResult(QiniuFile.getdownloadurl(domain, key,
                     "?imageView2/2/h/200", QiniuConstant.portrait_download_webpage_exp));
@@ -53,18 +58,36 @@ public class ImageController {
     }
 
     //获取上传token
-    //bucket:account,resources,social,product
-    @RequestMapping(value = "/getuploadtoken", method = RequestMethod.GET)
-    public Result uploadprepare(@RequestParam(value = "key") String key,@RequestParam(value = "bucket") String bucket,@RequestParam(value = "type") Integer type) {
+    //bucket:account,resources,social,product，articleresource
+     @RequestMapping(value = "/getuploadtoken", method = RequestMethod.GET)
+    public Result uploadprepare(@RequestParam(value = "key") String key,
+                                @RequestParam(value = "bucket") String bucket,
+                                @RequestParam(value = "type") Integer type)
+    {
+        if(key==null || bucket==null || type==null){
+            return ResultGenerator.genFailResult("parameter error");
+        }
+        Object rs = null;
+        if(key.contains(";")){
+            List list = new ArrayList<Map<String,Object>>();
+            for(String skey:key.split(";")){
+                list.add(genToken(skey,bucket,type));
+            }
+            rs = list;
+        }else{
+            rs = genToken(key,bucket,type);
+        }
+        return ResultGenerator.genSuccessResult(rs);
+    }
 
     private Map<String,Object> genToken(String key,String bucket,Integer type){
-         Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<String, Object>();
         try {
             String md5 = "";
             String fileName = "";
             Date date = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");// 小写的mm表示的是分钟
-            String localtime = sdf.format(date);
+            //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");// 小写的mm表示的是分钟
+            String localtime = System.currentTimeMillis()+"";
             switch (type) {
                 /**************基本信息部分**************/
                 //0:头像
@@ -104,7 +127,7 @@ public class ImageController {
                  *30:作物图片,31:作物种类图片,32:虫害图片,33：虫害虫态图片
                  *34：病害图片,35：缺素症图片，36：生物协迫图片
                  * 37：草害图片
-                */
+                 */
                 case 30:
                     fileName = "crop/picture/";
                     break;
@@ -128,13 +151,34 @@ public class ImageController {
                 case 37:
                     fileName = "crop/grass/";
                     break;
-                    /*************文章部门********/
-                    // 8：文章主图片
+                case 40:
+                    fileName = "product/product/";
+                    break;
+                case 41:
+                    fileName = "product/trademark/";
+                    break;
+                case 42:
+                    fileName = "product/license/";
+                    break;
+                case 43:
+                    fileName = "product/approve/";
+                    break;
+                case 44:
+                    fileName = "product/standard/";
+                    break;
+                case 45:
+                    fileName = "product/specification/";
+                    break;
+                /*************文章部门********/
+                // 8：文章主图片
                 case 8:
                     fileName = "article/mainpic/";
                     break;
+                case 9:
+                    fileName = "question/detail-pic/";
+                    break;
                 default:
-                    return ResultGenerator.genFailResult("wrong code!");
+                    return result;
             }
             fileName += MD5.getMD5String(localtime + key);
             result.put("key", fileName);
@@ -146,9 +190,8 @@ public class ImageController {
             result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResultGenerator.genFailResult(e.getCause().getMessage());
         }
-        return ResultGenerator.genSuccessResult(result);
+        return result;
     }
 
     //admin前端ueditor组件获取配置信息
