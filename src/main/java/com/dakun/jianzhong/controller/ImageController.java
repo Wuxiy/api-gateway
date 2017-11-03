@@ -6,9 +6,10 @@ import com.dakun.jianzhong.utils.MD5;
 import com.dakun.jianzhong.utils.Result;
 import com.dakun.jianzhong.utils.ResultGenerator;
 import com.qiniu.util.StringMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -17,20 +18,23 @@ import java.util.*;
 @RestController
 @RequestMapping("/images")
 public class ImageController {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     @GetMapping("/upload-token")
     public Result detail() {
         StringMap putPolicy = new StringMap().putNotEmpty("returnBody",
                 "{\"key\": $(key),\"ext\":$(ext)}");
-        String token = QiniuFile.getuploadtoken(QiniuConstant.bucket_resources,putPolicy);
+        String token = QiniuFile.getuploadtoken(QiniuConstant.bucket_resources, putPolicy);
         return ResultGenerator.genSuccessResult(token);
     }
 
     //用于网页获取小图片地址
     @GetMapping("/getspicurl")
-    public Result getpicurl(@RequestParam(required = true) String bucket,@RequestParam(required = true) String key) {
+    public Result getpicurl(@RequestParam(required = true) String bucket, @RequestParam(required = true) String key) {
         try {
-            String domain="";
-            switch (bucket){
+            String domain = "";
+            switch (bucket) {
                 case QiniuConstant.bucket_account:
                     domain = QiniuConstant.Domain_account;
                     break;
@@ -43,7 +47,13 @@ public class ImageController {
                 case QiniuConstant.bucket_resources:
                     domain = QiniuConstant.Domain_resources;
                     break;
-            };
+                case QiniuConstant.bucket_articleresource:
+                    domain = QiniuConstant.Domain_articleresource;
+                    break;
+                default:
+                    return ResultGenerator.genFailResult("bucket未找到");
+            }
+
             return ResultGenerator.genSuccessResult(QiniuFile.getdownloadurl(domain, key,
                     "?imageView2/2/h/200", QiniuConstant.portrait_download_webpage_exp));
         } catch (Exception e) {
@@ -53,34 +63,37 @@ public class ImageController {
     }
 
     //获取上传token
-    //bucket:account,resources,social,product
-     @RequestMapping(value = "/getuploadtoken", method = RequestMethod.GET)
-    public Result uploadprepare(@RequestParam(value = "key") String key,@RequestParam(value = "bucket") String bucket,@RequestParam(value = "type") Integer type)
-    {
-        if(key==null || bucket==null || type==null){
+    //bucket:account,resources,social,product,articleresource
+    @RequestMapping(value = "/getuploadtoken", method = RequestMethod.GET)
+    public Result uploadprepare(@RequestParam(value = "key") String key,
+                                @RequestParam(value = "bucket") String bucket,
+                                @RequestParam(value = "type") Integer type) {
+
+        if (key == null || bucket == null || type == null) {
             return ResultGenerator.genFailResult("parameter error");
         }
+
         Object rs = null;
-        if(key.contains(";")){
-            List list = new ArrayList<Map<String,Object>>();
-            for(String skey:key.split(";")){
-                list.add(genToken(skey,bucket,type));
+        if (key.contains(";")) {
+            List list = new ArrayList<Map<String, Object>>();
+            for (String skey : key.split(";")) {
+                list.add(genToken(skey, bucket, type));
             }
             rs = list;
-        }else{
-            rs = genToken(key,bucket,type);
+        } else {
+            rs = genToken(key, bucket, type);
         }
         return ResultGenerator.genSuccessResult(rs);
     }
 
-    private Map<String,Object> genToken(String key,String bucket,Integer type){
+    private Map<String, Object> genToken(String key, String bucket, Integer type) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             String md5 = "";
             String fileName = "";
             Date date = new Date();
             //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");// 小写的mm表示的是分钟
-            String localtime = System.currentTimeMillis()+"";
+            String localtime = System.currentTimeMillis() + "";
             switch (type) {
                 /**************基本信息部分**************/
                 //0:头像
@@ -159,6 +172,9 @@ public class ImageController {
                 case 44:
                     fileName = "product/standard/";
                     break;
+                case 45:
+                    fileName = "product/specification/";
+                    break;
                 /*************文章部门********/
                 // 8：文章主图片
                 case 8:
@@ -186,14 +202,14 @@ public class ImageController {
 
     //admin前端ueditor组件获取配置信息
     @RequestMapping(value = "/controller.action", method = RequestMethod.GET)
-    public Result controller(@RequestParam(value = "action") String action){
-        String imageUrl =  "http://up-z1.qiniu.com/";
+    public Result controller(@RequestParam(value = "action") String action) {
+        String imageUrl = "http://up-z1.qiniu.com/";
         Map<String, Object> result = new HashMap<String, Object>();
-        switch (action){
+        switch (action) {
             case "config":
-                String[] strings = {".jpg",".png",".jpeg",".gif",".bmp"};
+                String[] strings = {".jpg", ".png", ".jpeg", ".gif", ".bmp"};
                 List<String> imgTypeList = Arrays.asList(strings);
-                result.put("imageUrl",imageUrl);
+                result.put("imageUrl", imageUrl);
                 result.put("imageActionName", "uploadimage");
                 result.put("imageFieldName", "file");
                 result.put("imageMaxSize", "2048000");
@@ -201,7 +217,7 @@ public class ImageController {
                 result.put("imageUrlPrefix", "http://otpbyg9fz.bkt.clouddn.com/");
                 break;
             case "uploadimage":
-                result.put("imageUrl",imageUrl);
+                result.put("imageUrl", imageUrl);
                 break;
 
         }
