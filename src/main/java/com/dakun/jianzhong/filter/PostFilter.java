@@ -82,8 +82,7 @@ public class PostFilter extends ZuulFilter {
                         if ((Integer) response.get("status") == 200) {
                             Map<String, Object> admin = (Map<String, Object>) response.get("data");
                             //暂时无角色划分
-                            //String role = account.get("usertype").toString();
-                            String role = "1";
+                            Integer role = (Integer)admin.get("role_id");
                             Integer id = (Integer) admin.get("id");
                             String idStr = String.valueOf(id);
                             if (id == null) idStr = "wrong";
