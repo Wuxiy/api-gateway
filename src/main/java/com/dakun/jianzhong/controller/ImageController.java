@@ -191,8 +191,29 @@ public class ImageController {
         return result;
     }
 
+    //获取上传token
+    //bucket:account,resources,social,product,articleresource
+    @RequestMapping(value = "/getcommontoken", method = RequestMethod.GET)
+    public Result uploadpdf(@RequestParam(value = "key") String key,
+                                @RequestParam(value = "bucket") String bucket,
+                                @RequestParam(value = "type") Integer type) {
 
-    private Map<String, Object> getpdftoken(String key, String bucket, Integer type) {
+        if (key == null || bucket == null || type == null) {
+            return ResultGenerator.genFailResult("parameter error");
+        }
+        Object rs = null;
+        if (key.contains(";")) {
+            List list = new ArrayList<Map<String, Object>>();
+            for (String skey : key.split(";")) {
+                list.add(getcommontoken(skey, bucket, type));
+            }
+            rs = list;
+        } else {
+            rs = getcommontoken(key, bucket, type);
+        }
+        return ResultGenerator.genSuccessResult(rs);
+    }
+    private Map<String, Object> getcommontoken(String key, String bucket, Integer type) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             String md5 = "";
