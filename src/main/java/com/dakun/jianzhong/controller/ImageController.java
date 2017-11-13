@@ -163,15 +163,6 @@ public class ImageController {
                 case 41:
                     fileName = "product/trademark/";
                     break;
-                case 42:
-                    fileName = "product/license/";
-                    break;
-                case 43:
-                    fileName = "product/approve/";
-                    break;
-                case 44:
-                    fileName = "product/standard/";
-                    break;
                 case 45:
                     fileName = "product/specification/";
                     break;
@@ -193,6 +184,45 @@ public class ImageController {
                             "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
             putPolicy.putNotEmpty("persistentOps",
                     "imageMogr2/thumbnail/800*800");
+            result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    private Map<String, Object> getpdftoken(String key, String bucket, Integer type) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            String md5 = "";
+            String fileName = "";
+            Date date = new Date();
+            //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");// 小写的mm表示的是分钟
+            String localtime = System.currentTimeMillis() + "";
+            switch (type) {
+                /************作物部分*****************/
+                /**
+                 *42:许可证 43：批准文件
+                 *44：标准
+                 */
+                case 42:
+                    fileName = "product/license/";
+                    break;
+                case 43:
+                    fileName = "product/approve/";
+                    break;
+                case 44:
+                    fileName = "product/standard/";
+                    break;
+                default:
+                    return result;
+            }
+            fileName += MD5.getMD5String(localtime + key);
+            result.put("key", fileName);
+            StringMap putPolicy = new StringMap()
+                    .putNotEmpty("returnBody",
+                            "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
             result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
         } catch (Exception e) {
             e.printStackTrace();
