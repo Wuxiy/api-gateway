@@ -61,7 +61,7 @@ public class SmsController {
                     SMSConstant.SIGN_OF_DAKUNKEJI,
                     SMSConstant.LOGIN_CODE,"{\"code\":"+code+"}");*/
             operations.set(redisKey, code);
-            redisTemplate.expire(redisKey, EXPIRE_SECONDS, TimeUnit.SECONDS);
+            redisTemplate.expire(redisKey, EXPIRE_SECONDS, TimeUnit.DAYS);
             return ResultGenerator.genSuccessResult();
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,7 +77,7 @@ public class SmsController {
         if(storedCode == null) {
             return ResultGenerator.genFailResult("expired");
         }
-        redisTemplate.delete(redisKey);
+       /* redisTemplate.delete(redisKey);*/
         if(code.equals(storedCode)) {
             return ResultGenerator.genSuccessResult();
         }

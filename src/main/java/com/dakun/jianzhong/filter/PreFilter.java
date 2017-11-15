@@ -120,8 +120,7 @@ public class PreFilter extends ZuulFilter {
                 String phone = requestParams.get("mobile").get(0);
                 ValueOperations<String, Object> operations = redisTemplate.opsForValue();
                 String redisKey = TextUtils.getSMSRedisKey(phone);
-               /* String storedCode = (String) operations.get(TextUtils.getSMSRedisKey(phone));*/
-                String storedCode = (String) operations.get(TextUtils.getSMSRedisKey(""));
+                String storedCode = (String) operations.get(TextUtils.getSMSRedisKey(phone));
                 if (storedCode == null) {
                     ctx.setResponseStatusCode(401);
                     Map<String, Object> result = new HashMap<String, Object>();
@@ -142,7 +141,7 @@ public class PreFilter extends ZuulFilter {
                     ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
                     return null;
                 }
-                redisTemplate.delete(redisKey);
+                /*redisTemplate.delete(redisKey);*/
                 return null;
             } else if (uri.equals("/account-service/admin/login")) {
                 return null;

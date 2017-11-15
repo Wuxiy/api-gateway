@@ -119,7 +119,8 @@ public class TextUtils {
     }
 
     public static String getSMSRedisKey(String phone) {
-        return "sms:"+phone;
+        return "sms:";
+        /*return "sms:"+phone;*/
     }
     //62进制基数无序序列
     public static final char[] disordered_62= "0KJL1MIN2OHP3QGR4SFzTy5xUwEvVu6tWsDrXq7pYoCnZm8lakBjbih9gcfAed".toCharArray();
