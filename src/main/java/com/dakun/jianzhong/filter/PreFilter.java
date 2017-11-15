@@ -141,7 +141,7 @@ public class PreFilter extends ZuulFilter {
                     ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
                     return null;
                 }
-                redisTemplate.delete(redisKey);
+               // redisTemplate.delete(redisKey);
                 return null;
             } else if (uri.equals("/account-service/admin/login")) {
                 return null;

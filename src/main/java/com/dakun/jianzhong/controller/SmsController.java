@@ -47,7 +47,8 @@ public class SmsController {
             return ResultGenerator.genFailResult("wrong");
         }
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-        String redisKey = TextUtils.getSMSRedisKey(phone);
+       /* String redisKey = TextUtils.getSMSRedisKey(phone);*/
+        String redisKey = TextUtils.getSMSRedisKey("");
         Long seconds = redisTemplate.getExpire(redisKey,TimeUnit.SECONDS);
        /* if(seconds >= EXPIRE_SECONDS - FREEZE_SECONDS) {
             return ResultGenerator.genFailResult("频繁获取验证码");
@@ -61,7 +62,8 @@ public class SmsController {
                     SMSConstant.SIGN_OF_DAKUNKEJI,
                     SMSConstant.LOGIN_CODE,"{\"code\":"+code+"}");*/
             operations.set(redisKey, code);
-            redisTemplate.expire(redisKey, EXPIRE_SECONDS, TimeUnit.SECONDS);
+            /*redisTemplate.expire(redisKey, EXPIRE_SECONDS, TimeUnit.SECONDS);*/
+            redisTemplate.expire(redisKey, EXPIRE_SECONDS, TimeUnit.DAYS);
             return ResultGenerator.genSuccessResult();
         } catch (Exception e) {
             e.printStackTrace();
