@@ -49,19 +49,21 @@ public class SmsController {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         String redisKey = TextUtils.getSMSRedisKey(phone);
         Long seconds = redisTemplate.getExpire(redisKey,TimeUnit.SECONDS);
-        if(seconds >= EXPIRE_SECONDS - FREEZE_SECONDS) {
+       /* if(seconds >= EXPIRE_SECONDS - FREEZE_SECONDS) {
             return ResultGenerator.genFailResult("频繁获取验证码");
         }
-        String code = TextUtils.getRandNum(4);
+        String code = TextUtils.getRandNum(4);*/
+       //正式上线之前
+        String code = "1234";
         try {
-            CommonSMS.sendcommonmsg(
+            /*CommonSMS.sendcommonmsg(
                     phone,
                     SMSConstant.SIGN_OF_DAKUNKEJI,
-                    SMSConstant.LOGIN_CODE,"{\"code\":"+code+"}");
+                    SMSConstant.LOGIN_CODE,"{\"code\":"+code+"}");*/
             operations.set(redisKey, code);
             redisTemplate.expire(redisKey, EXPIRE_SECONDS, TimeUnit.SECONDS);
             return ResultGenerator.genSuccessResult();
-        } catch (ClientException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResultGenerator.genFailResult(e.getMessage());
         }
