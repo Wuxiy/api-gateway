@@ -192,7 +192,7 @@ public class PreFilter extends ZuulFilter {
                                 Claims claim = JWTUtils.parseJWT(jwt);
                                 ctx.addZuulRequestHeader("adminId", claim.getId());
                                 JSONObject object = JSONObject.parseObject(claim.getSubject());
-                                ctx.addZuulRequestHeader("usertype", object.getString("role"));
+                                ctx.addZuulRequestHeader("role", object.getString("role"));
                             } else {
                                 Claims claim = JWTUtils.parseJWT(jwt);
                                 System.out.println("accountId:" + claim.getId());
