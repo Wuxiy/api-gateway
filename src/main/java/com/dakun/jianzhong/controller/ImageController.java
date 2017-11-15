@@ -52,7 +52,8 @@ public class ImageController {
                     break;
                 default:
                     return ResultGenerator.genFailResult("bucket未找到");
-            };
+            }
+
             return ResultGenerator.genSuccessResult(QiniuFile.getdownloadurl(domain, key,
                     "?imageView2/2/h/200", QiniuConstant.portrait_download_webpage_exp));
         } catch (Exception e) {

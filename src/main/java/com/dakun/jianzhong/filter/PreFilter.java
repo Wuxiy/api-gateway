@@ -120,7 +120,8 @@ public class PreFilter extends ZuulFilter {
                 String phone = requestParams.get("mobile").get(0);
                 ValueOperations<String, Object> operations = redisTemplate.opsForValue();
                 String redisKey = TextUtils.getSMSRedisKey(phone);
-                String storedCode = (String) operations.get(TextUtils.getSMSRedisKey(phone));
+               /* String storedCode = (String) operations.get(TextUtils.getSMSRedisKey(phone));*/
+                String storedCode = (String) operations.get(TextUtils.getSMSRedisKey(""));
                 if (storedCode == null) {
                     ctx.setResponseStatusCode(401);
                     Map<String, Object> result = new HashMap<String, Object>();
