@@ -19,12 +19,12 @@ public class JWTUtils {
     static private SecretKey generalKey() {
         if(key != null) return key;
         String secret = "zxjertansdiqaewalsdnf";
-        try {
-            KeySpec keySpec = new DESKeySpec(secret.getBytes());
-            key = SecretKeyFactory.getInstance("DES").generateSecret(keySpec);
-        }
-        catch(Exception e) {
-            System.out.println(e);
+            try {
+                KeySpec keySpec = new DESKeySpec(secret.getBytes());
+                key = SecretKeyFactory.getInstance("DES").generateSecret(keySpec);
+            }
+            catch(Exception e) {
+                System.out.println(e);
         }
         return key;
     }
