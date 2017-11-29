@@ -1,7 +1,6 @@
 package com.dakun.jianzhong;
 
-import com.dakun.jianzhong.filter.PostFilter;
-import com.dakun.jianzhong.filter.PreFilter;
+import com.dakun.jianzhong.filter.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -57,5 +56,27 @@ public class Application {
     @Bean
     public PostFilter postFilter() {
         return new PostFilter();
+    }
+
+    @Bean
+    public BeforeRequestLoggingFilter beforeRequestLoggingFilter() {
+
+        BeforeRequestLoggingFilter filter = new BeforeRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(10000);
+        filter.setIncludeHeaders(false);
+
+        return filter;
+    }
+
+    @Bean
+    public PerformancePreFilter performancePreFilter() {
+        return new PerformancePreFilter();
+    }
+
+    @Bean
+    public PerformancePostFilter performancePostFilter() {
+        return new PerformancePostFilter();
     }
 }
