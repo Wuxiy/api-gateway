@@ -16,12 +16,12 @@ public class BeforeRequestLoggingFilter extends AbstractRequestLoggingFilter {
 
     @Override
     protected void beforeRequest(HttpServletRequest request, String message) {
-        logger.debug(message);
+        logger.info(message);
     }
 
     @Override
     protected void afterRequest(HttpServletRequest request, String message) {
-        logger.debug(message);
+        logger.info(message);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class BeforeRequestLoggingFilter extends AbstractRequestLoggingFilter {
 
     @Override
     public boolean shouldFilter() {
-        return logger.isDebugEnabled();
+        return logger.isInfoEnabled();
     }
 
     @Override

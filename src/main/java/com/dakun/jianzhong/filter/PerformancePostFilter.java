@@ -26,7 +26,7 @@ public class PerformancePostFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return logger.isTraceEnabled();
+        return logger.isInfoEnabled();
     }
 
     @Override
@@ -37,8 +37,8 @@ public class PerformancePostFilter extends ZuulFilter {
         StopWatch stopWatch = (StopWatch) context.get("performanceStopWatch");
         stopWatch.stop();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(stopWatch.shortSummary());
+        if (logger.isInfoEnabled()) {
+            logger.info(stopWatch.shortSummary());
         }
 
         return null;
