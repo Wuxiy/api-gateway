@@ -3,6 +3,8 @@ package com.dakun.jianzhong;
 import com.dakun.jianzhong.filter.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +17,8 @@ import org.springframework.web.filter.CorsFilter;
  * Created by wangh09 on 2017/9/23.
  */
 @EnableZuulProxy
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
+        DataSourceTransactionManagerAutoConfiguration.class})
 public class Application {
 
     @Bean
