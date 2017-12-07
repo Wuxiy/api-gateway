@@ -1,9 +1,10 @@
 package com.dakun.jianzhong;
 
-import com.dakun.jianzhong.filter.PostFilter;
-import com.dakun.jianzhong.filter.PreFilter;
+import com.dakun.jianzhong.filter.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
@@ -12,31 +13,30 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by wangh09 on 2017/9/23.
  */
 @EnableZuulProxy
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
+        DataSourceTransactionManagerAutoConfiguration.class})
 public class Application {
+
     @Bean
     @LoadBalanced
     RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
+
     @Bean
     public CorsFilter corsFilter() {
+
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-
-        List<String> list = new ArrayList<String>();
-        config.setMaxAge(18000L);// 预检请求的缓存时间（秒），即在这个时间段里，对于相同的跨域请求不会再预检了
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("OPTIONS");
@@ -47,14 +47,39 @@ public class Application {
         config.addAllowedMethod("DELETE");
         config.addAllowedMethod("PATCH");
         source.registerCorsConfiguration("/**", config);
+
         return new CorsFilter(source);
     }
+
     @Bean
     public PreFilter accessFilter() {
         return new PreFilter();
     }
+
     @Bean
     public PostFilter postFilter() {
         return new PostFilter();
+    }
+
+    @Bean
+    public BeforeRequestLoggingFilter beforeRequestLoggingFilter() {
+
+        BeforeRequestLoggingFilter filter = new BeforeRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(10000);
+        filter.setIncludeHeaders(false);
+
+        return filter;
+    }
+
+    @Bean
+    public PerformancePreFilter performancePreFilter() {
+        return new PerformancePreFilter();
+    }
+
+    @Bean
+    public PerformancePostFilter performancePostFilter() {
+        return new PerformancePostFilter();
     }
 }
