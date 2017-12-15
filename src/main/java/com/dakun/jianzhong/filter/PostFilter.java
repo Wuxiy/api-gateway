@@ -40,7 +40,7 @@ public class PostFilter extends ZuulFilter {
     public static void main (String[] a){
 
         try {
-            System.out.println(JWTUtils.createJWT("35","{\""+"role\":"+"1"+",\"deviceId\":\""+"fffffffffba49af767a0185117f97614"+"\"}", -1));
+            System.out.println(JWTUtils.createJWT("69","{\""+"role\":"+"3"+",\"deviceId\":\""+"000000006094d46b3b066c04147987e1"+"\"}", -1));
         } catch (Exception e) {
             e.printStackTrace();
         }
