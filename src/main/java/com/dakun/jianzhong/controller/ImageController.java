@@ -186,12 +186,15 @@ public class ImageController {
                 case 10:
                     //示范产品图片
                     fileName = "example/product/";
+                    break;
                 case 101:
                     //使用前图片
                     fileName = "example/before/";
+                    break;
                 case 102:
                     //使用后图片
                     fileName = "example/after/";
+                    break;
                 default:
                     return result;
             }
