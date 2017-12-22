@@ -1,9 +1,10 @@
 package com.dakun.jianzhong;
 
-import com.dakun.jianzhong.filter.PostFilter;
-import com.dakun.jianzhong.filter.PreFilter;
+import com.dakun.jianzhong.filter.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,8 @@ import org.springframework.web.filter.CorsFilter;
  * Created by wangh09 on 2017/9/23.
  */
 @EnableZuulProxy
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
+        DataSourceTransactionManagerAutoConfiguration.class})
 public class Application {
 
     @Bean
@@ -57,5 +59,27 @@ public class Application {
     @Bean
     public PostFilter postFilter() {
         return new PostFilter();
+    }
+
+    @Bean
+    public BeforeRequestLoggingFilter beforeRequestLoggingFilter() {
+
+        BeforeRequestLoggingFilter filter = new BeforeRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(10000);
+        filter.setIncludeHeaders(false);
+
+        return filter;
+    }
+
+    @Bean
+    public PerformancePreFilter performancePreFilter() {
+        return new PerformancePreFilter();
+    }
+
+    @Bean
+    public PerformancePostFilter performancePostFilter() {
+        return new PerformancePostFilter();
     }
 }
