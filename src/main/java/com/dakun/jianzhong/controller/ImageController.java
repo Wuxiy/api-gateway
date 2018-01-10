@@ -180,8 +180,28 @@ public class ImageController {
                 case 8:
                     fileName = "article/mainpic/";
                     break;
+                //文章段落图片
+                case 80:
+                    fileName = "article/detail-pic/";
+                    break;
+                //文章html文件
+                case 81:
+                    fileName = "article/richtxt/";
+                    break;
                 case 9:
                     fileName = "question/detail-pic/";
+                    break;
+                case 10:
+                    //示范产品图片
+                    fileName = "example/product/";
+                    break;
+                case 101:
+                    //使用前图片
+                    fileName = "example/before/";
+                    break;
+                case 102:
+                    //使用后图片
+                    fileName = "example/after/";
                     break;
                 default:
                     return result;
