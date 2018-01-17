@@ -1,6 +1,5 @@
 package com.dakun.jianzhong.controller;
 
-import com.aliyuncs.exceptions.ClientException;
 import com.dakun.jianzhong.service.sms.CommonSMS;
 import com.dakun.jianzhong.service.sms.SMSConstant;
 import com.dakun.jianzhong.utils.Result;
@@ -52,7 +51,8 @@ public class SmsController {
         if(seconds >= EXPIRE_SECONDS - FREEZE_SECONDS) {
             return ResultGenerator.genFailResult("频繁获取验证码");
         }
-        String code = TextUtils.getRandNum(4);
+//        String code = TextUtils.getRandNum(4);
+        String code = "1234";
        //正式上线之前
         try {
             CommonSMS.sendcommonmsg(
