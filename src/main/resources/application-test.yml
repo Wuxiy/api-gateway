@@ -1,0 +1,15 @@
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://192.168.50.103:4040/eureka/
+    instance:
+        lease-renewal-interval-in-seconds: 10
+        prefer-ip-address: true
+spring:
+    redis:
+        host: 192.168.50.104
+        port: 6379
+zuul:
+    debug:
+        request: true
+    include-debug-header: true

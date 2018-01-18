@@ -2,19 +2,15 @@ package com.dakun.jianzhong.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dakun.jianzhong.service.qiniu.QiniuConstant;
-import com.dakun.jianzhong.service.qiniu.QiniuFile;
 import com.dakun.jianzhong.utils.JWTUtils;
 import com.dakun.jianzhong.utils.ServerUtils;
 import com.dakun.jianzhong.utils.TextUtils;
-import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,44 +20,26 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangh09 on Thu Jul 13 14:40:25 GMT+08:00 2017.
  */
-public class PreFilter extends ZuulFilter {
+public class PreFilter extends AbstractPathMatchingFilter {
     @Autowired
     private RestTemplate restTemplate;
 
     private RedisTemplate redisTemplate;
 
     @Autowired(required = false)
-    public void setRedisTemplate(RedisTemplate redisTemplate) {
-        RedisSerializer stringSerializer = new StringRedisSerializer();
-        redisTemplate.setKeySerializer(stringSerializer);
-        redisTemplate.setValueSerializer(stringSerializer);
-        redisTemplate.setHashKeySerializer(stringSerializer);
-        redisTemplate.setHashValueSerializer(stringSerializer);
-        this.redisTemplate = redisTemplate;
+    public void setRedisTemplate(StringRedisTemplate stringRedisTemplate) {
+        this.redisTemplate = stringRedisTemplate;
     }
 
     public PreFilter() {
-    }
-
-    @Override
-    public String filterType() {
-
-        return "pre";
-    }
-
-    @Override
-    public int filterOrder() {
-        return 1;
-    }
-
-    @Override
-    public boolean shouldFilter() {
-        return true;
+        setFilterName("loginFilter");
     }
 
     @Override
@@ -72,46 +50,6 @@ public class PreFilter extends ZuulFilter {
             HttpServletRequest request = ctx.getRequest();
 
             String uri = request.getRequestURI();
-
-            //*************************************处理图片
-            if (uri.startsWith("/image/")) {
-                try {
-                    String fileName = uri.split("/image/")[1];
-                    if (fileName == null) {
-                        Map<String, Object> result = new HashMap<String, Object>();
-                        result.put("message", "没有图片名称");
-                        result.put("status", 404);
-                        ctx.setResponseBody(JSON.toJSONString(result));
-                        ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
-                    }
-                    Enumeration<String> enumerator = request.getParameterNames();
-                    StringBuilder builder = new StringBuilder("");
-                    while (enumerator.hasMoreElements()) {
-                        builder.append(enumerator.nextElement());
-                    }
-                    String imageType = builder.toString();
-                    String downloadURL = QiniuFile.getdownloadurl(QiniuConstant.Domain_resources, fileName, imageType, QiniuConstant.portrait_download_app_exp);
-                    Map<String, List<String>> qp = new HashMap<String, List<String>>();
-                    String paramsPairs = downloadURL.split("\\?")[1];
-                    String[] params = paramsPairs.split("&");
-
-                    for (int i = 0; i < params.length; i++) {
-                        List<String> paramList = new ArrayList<>();
-                        paramList.add(params[i + 1]);
-                        qp.put(params[i], paramList);
-                        i++;
-                    }
-                    ctx.setRequestQueryParams(qp);
-                } catch (Exception e) {
-                    Map<String, Object> result = new HashMap<String, Object>();
-                    result.put("message", "图片地址错误");
-                    result.put("status", 404);
-                    ctx.setResponseBody(JSON.toJSONString(result));
-                    ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
-                }
-
-                return null;
-            }
 
             //*************************************登陆验证码
             if (uri.equals("/account-service/user/login")) {

@@ -1,6 +1,5 @@
 package com.dakun.jianzhong;
 
-import com.dakun.jianzhong.filter.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -51,35 +50,4 @@ public class Application {
         return new CorsFilter(source);
     }
 
-    @Bean
-    public PreFilter accessFilter() {
-        return new PreFilter();
-    }
-
-    @Bean
-    public PostFilter postFilter() {
-        return new PostFilter();
-    }
-
-    @Bean
-    public BeforeRequestLoggingFilter beforeRequestLoggingFilter() {
-
-        BeforeRequestLoggingFilter filter = new BeforeRequestLoggingFilter();
-        filter.setIncludeQueryString(true);
-        filter.setIncludePayload(true);
-        filter.setMaxPayloadLength(10000);
-        filter.setIncludeHeaders(false);
-
-        return filter;
-    }
-
-    @Bean
-    public PerformancePreFilter performancePreFilter() {
-        return new PerformancePreFilter();
-    }
-
-    @Bean
-    public PerformancePostFilter performancePostFilter() {
-        return new PerformancePostFilter();
-    }
 }
