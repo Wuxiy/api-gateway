@@ -8,6 +8,7 @@ eureka:
 management:
     security:
         enabled: false
+
 spring:
     redis:
         host: 192.168.50.104
