@@ -1,0 +1,51 @@
+server:
+    port: 2911
+spring:
+    application:
+        name: api-gateway
+    http:
+        multipart:
+            max-file-size: 20MB
+            max-request-size: 20MB
+zuul:
+    host:
+        connect-timeout-millis: 60000
+        socket-timeout-millis: 60000
+    routes:
+        account-service:
+            path: /account-service/**
+            serviceId: ACCOUNT-SERVICE
+        api-image:
+            path: /image/**
+            url: http://ot9fb9yy1.bkt.clouddn.com/
+        product-service:
+            path: /product-service/**
+            serviceId: PRODUCT-SERVICE
+        resource-service:
+            path: /resource-service/**
+            serviceId: RESOURCE-SERVICE
+        social-service:
+            path: /social-service/**
+            serviceId: SOCIAL-SERVICE
+        weixin-service:
+                    path: /weixin-service/**
+                    serviceId: WEIXIN-SERVICE
+hystrix:
+    command:
+        default:
+            execution:
+                isolation:
+                    thread:
+                        timeoutInMilliseconds: 60000
+logging:
+    level:
+        com:
+            dakun:
+                jianzhong:
+                    filter: TRACE
+zhuannong:
+    filter:
+        filter-chain-definitions:
+            /image/**: imageFilter
+            /account-service/admin/company/login: companyLoginFilter
+            /**: loginFilter
