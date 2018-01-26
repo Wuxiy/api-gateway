@@ -45,4 +45,5 @@ zhuannong:
         filter-chain-definitions:
             /image/**: imageFilter
             /account-service/admin/company/login: companyLoginFilter
+            /product-service/ueditor/**: none
             /**: loginFilter
