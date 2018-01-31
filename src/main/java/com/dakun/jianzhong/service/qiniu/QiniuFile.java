@@ -126,6 +126,17 @@ public class QiniuFile {
 		return downloadUrl;
 	}
 
+	/**
+	 * 获取公共下载地址
+	 * @param domain
+	 * @param key
+	 * @return
+	 */
+	public static String getPublishUrl(String domain, String key){
+		String baseUrl = "http://" + domain + "/" + key;
+		return baseUrl;
+	}
+
 	/*
 	 * 移动文件 bucketSrc:源目标空间名 keySrc:源目标文件名 bucketDest:源目标空间名 keyDest:源目标文件名
 	 */

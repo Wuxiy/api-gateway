@@ -28,8 +28,14 @@ public class ImageController {
         String token = QiniuFile.getuploadtoken(QiniuConstant.bucket_resources, putPolicy);
         return ResultGenerator.genSuccessResult(token);
     }
-
-    //用于网页获取小图片地址
+    //获取视频的地址
+    @GetMapping("/getvideourl")
+    public Result getvideourl(@RequestParam(required = true) String key) {
+            String domain = QiniuConstant.Domain_articleresource;
+            String baseUrl = QiniuFile.getPublishUrl(domain,key);
+            return ResultGenerator.genSuccessResult(baseUrl);
+    }
+        //用于网页获取小图片地址
     @GetMapping("/getspicurl")
     public Result getpicurl(@RequestParam(required = true) String bucket, @RequestParam(required = true) String key) {
         try {
@@ -84,6 +90,27 @@ public class ImageController {
             rs = genToken(key, bucket, type);
         }
         return ResultGenerator.genSuccessResult(rs);
+    }
+
+    //获取视频上传token
+    //bucket:account,resources,social,product,articleresource
+    @RequestMapping(value = "/getuploadtoken4V", method = RequestMethod.GET)
+    public Result uploadprepare4V(@RequestParam(value = "key") String key,
+                                @RequestParam(value = "bucket") String bucket) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if (key == null || bucket == null ) {
+            return ResultGenerator.genFailResult("parameter error");
+        }
+        String fileName = "spec/video/";
+        Date date = new Date();
+        String localtime = System.currentTimeMillis() + "";
+        fileName += MD5.getMD5String(localtime + key);
+        result.put("key", fileName);
+        StringMap putPolicy = new StringMap()
+                .putNotEmpty("returnBody",
+                        "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
+        result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
+        return ResultGenerator.genSuccessResult(result);
     }
 
     private Map<String, Object> genToken(String key, String bucket, Integer type) {
