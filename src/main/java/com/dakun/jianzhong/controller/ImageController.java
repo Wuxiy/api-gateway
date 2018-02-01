@@ -101,14 +101,18 @@ public class ImageController {
         if (key == null || bucket == null ) {
             return ResultGenerator.genFailResult("parameter error");
         }
+
+        String suffix = key.substring(key.lastIndexOf("."));
         String fileName = "spec/video/";
         Date date = new Date();
         String localtime = System.currentTimeMillis() + "";
         fileName += MD5.getMD5String(localtime + key);
+        fileName += suffix;
         result.put("key", fileName);
         StringMap putPolicy = new StringMap()
                 .putNotEmpty("returnBody",
-                        "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
+                        "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}")
+                .putNotEmpty("mimeLimit", "video/mp4");
         result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
         return ResultGenerator.genSuccessResult(result);
     }
