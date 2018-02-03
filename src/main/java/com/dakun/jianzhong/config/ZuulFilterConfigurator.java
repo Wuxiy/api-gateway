@@ -1,6 +1,7 @@
 package com.dakun.jianzhong.config;
 
 import com.dakun.jianzhong.filter.*;
+import com.dakun.jianzhong.filter.error.ErrorFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,6 +11,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class ZuulFilterConfigurator {
+
+    @Bean
+    public ErrorFilter errorFilter() {
+        return new ErrorFilter();
+    }
 
     @Bean
     public FilterMatchProperties filterMatchProperties() {
