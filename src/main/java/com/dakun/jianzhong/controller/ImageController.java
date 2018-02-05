@@ -122,7 +122,6 @@ public class ImageController {
 
         String suffix = key.substring(key.lastIndexOf("."));
         String fileName = "spec/video/";
-        Date date = new Date();
         String localtime = System.currentTimeMillis() + "";
         fileName += MD5.getMD5String(localtime + key);
         fileName += suffix;
@@ -194,6 +193,7 @@ public class ImageController {
                     break;
                 case 33:
                     fileName = "pest/pestpic/";
+                    break;
                 case 34:
                     fileName = "crop/disease/";
                     break;
