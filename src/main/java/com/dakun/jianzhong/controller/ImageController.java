@@ -228,6 +228,10 @@ public class ImageController {
                 case 46:
                     fileName = "product/speccomment/";
                     break;
+                //用药图文图片上传
+                case 47:
+                    fileName = "product/specarticle/";
+                    break;
                 /*************文章部门********/
                 // 8：文章主图片
                 case 8:
