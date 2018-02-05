@@ -29,23 +29,23 @@ public class ImageController {
         return ResultGenerator.genSuccessResult(token);
     }
     //获取评论图片上传token
-    @RequestMapping("/getCommentToken")
-    public Result getToken(@RequestParam String key){
-        Map<String, Object> result = new HashMap<String, Object>();
-        if (key == null) {
-            return ResultGenerator.genFailResult("parameter error");
-        }
-        String fileName = "product/spec/comment";
-        Date date = new Date();
-        String localtime = System.currentTimeMillis() + "";
-        fileName += MD5.getMD5String(localtime + key);
-        result.put("key", fileName);
-        StringMap putPolicy = new StringMap()
-                .putNotEmpty("returnBody",
-                        "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
-        result.put("token", QiniuFile.getuploadtoken(QiniuConstant.bucket_product, putPolicy));
-        return ResultGenerator.genSuccessResult(result);
-    }
+//    @RequestMapping("/getCommentToken")
+//    public Result getToken(@RequestParam String key){
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        if (key == null) {
+//            return ResultGenerator.genFailResult("parameter error");
+//        }
+//        String fileName = "product/spec/comment";
+//        Date date = new Date();
+//        String localtime = System.currentTimeMillis() + "";
+//        fileName += MD5.getMD5String(localtime + key);
+//        result.put("key", fileName);
+//        StringMap putPolicy = new StringMap()
+//                .putNotEmpty("returnBody",
+//                        "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
+//        result.put("token", QiniuFile.getuploadtoken(QiniuConstant.bucket_product, putPolicy));
+//        return ResultGenerator.genSuccessResult(result);
+//    }
     //获取视频的地址
     @GetMapping("/getvideourl")
     public Result getvideourl(@RequestParam(required = true) String key) {
