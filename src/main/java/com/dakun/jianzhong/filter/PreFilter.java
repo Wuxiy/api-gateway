@@ -52,7 +52,7 @@ public class PreFilter extends AbstractPathMatchingFilter {
             String uri = request.getRequestURI();
 
             //*************************************登陆验证码
-            if (uri.equals("/account-service/user/login")) {
+            if ("/account-service/user/login".equals(uri) || "/account-service/user/mobile/login".equals(uri)) {
                 Map<String, List<String>> requestParams = ctx.getRequestQueryParams();
                 String code = requestParams.get("code").get(0);
                 String phone = requestParams.get("mobile").get(0);
@@ -81,7 +81,7 @@ public class PreFilter extends AbstractPathMatchingFilter {
                 }
                 redisTemplate.delete(redisKey);
                 return null;
-            } else if (uri.equals("/account-service/admin/login")) {
+            } else if ("/account-service/admin/login".equals(uri)) {
                 return null;
             }
             //*************************************处理权限
