@@ -51,7 +51,7 @@ public class PostFilter extends ZuulFilter {
         try {
             HttpServletRequest request = ctx.getRequest();
             String uri = request.getRequestURI();
-            if (uri.equals("/account-service/user/login")) {
+            if ("/account-service/user/login".equals(uri) || "/account-service/user/mobile/login".equals(uri)) {
                 if (ctx.getResponseStatusCode() == 200) {
                     try (final InputStream responseDataStream = ctx.getResponseDataStream()) {
                         Map<String,Object> response = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")),Map.class);
@@ -75,7 +75,7 @@ public class PostFilter extends ZuulFilter {
                     return null;
                 }
                 return null;
-            }else  if (uri.equals("/account-service/admin/login")) {
+            }else  if ("/account-service/admin/login".equals(uri)) {
                 if (ctx.getResponseStatusCode() == 200) {
                     try (final InputStream responseDataStream = ctx.getResponseDataStream()) {
                         Map<String,Object> response = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")),Map.class);

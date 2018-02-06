@@ -28,8 +28,32 @@ public class ImageController {
         String token = QiniuFile.getuploadtoken(QiniuConstant.bucket_resources, putPolicy);
         return ResultGenerator.genSuccessResult(token);
     }
-
-    //用于网页获取小图片地址
+    //获取评论图片上传token
+//    @RequestMapping("/getCommentToken")
+//    public Result getToken(@RequestParam String key){
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        if (key == null) {
+//            return ResultGenerator.genFailResult("parameter error");
+//        }
+//        String fileName = "product/spec/comment";
+//        Date date = new Date();
+//        String localtime = System.currentTimeMillis() + "";
+//        fileName += MD5.getMD5String(localtime + key);
+//        result.put("key", fileName);
+//        StringMap putPolicy = new StringMap()
+//                .putNotEmpty("returnBody",
+//                        "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
+//        result.put("token", QiniuFile.getuploadtoken(QiniuConstant.bucket_product, putPolicy));
+//        return ResultGenerator.genSuccessResult(result);
+//    }
+    //获取视频的地址
+    @GetMapping("/getvideourl")
+    public Result getvideourl(@RequestParam(required = true) String key) {
+            String domain = QiniuConstant.Domain_articleresource;
+            String baseUrl = QiniuFile.getPublishUrl(domain,key);
+            return ResultGenerator.genSuccessResult(baseUrl);
+    }
+        //用于网页获取小图片地址
     @GetMapping("/getspicurl")
     public Result getpicurl(@RequestParam(required = true) String bucket, @RequestParam(required = true) String key) {
         try {
@@ -86,6 +110,30 @@ public class ImageController {
         return ResultGenerator.genSuccessResult(rs);
     }
 
+    //获取视频上传token
+    //bucket:account,resources,social,product,articleresource
+    @RequestMapping(value = "/getuploadtoken4V", method = RequestMethod.GET)
+    public Result uploadprepare4V(@RequestParam(value = "key") String key,
+                                @RequestParam(value = "bucket") String bucket) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if (key == null || bucket == null ) {
+            return ResultGenerator.genFailResult("parameter error");
+        }
+
+        String suffix = key.substring(key.lastIndexOf("."));
+        String fileName = "spec/video/";
+        String localtime = System.currentTimeMillis() + "";
+        fileName += MD5.getMD5String(localtime + key);
+        fileName += suffix;
+        result.put("key", fileName);
+        StringMap putPolicy = new StringMap()
+                .putNotEmpty("returnBody",
+                        "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}")
+                .putNotEmpty("mimeLimit", "video/mp4");
+        result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
+        return ResultGenerator.genSuccessResult(result);
+    }
+
     private Map<String, Object> genToken(String key, String bucket, Integer type) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
@@ -132,7 +180,7 @@ public class ImageController {
                 /**
                  *30:作物图片,31:作物种类图片,32:虫害图片,33：虫害虫态图片
                  *34：病害图片,35：缺素症图片，36：生物协迫图片
-                 * 37：草害图片
+                 * 37：草害图片,46:评论图片
                  */
                 case 30:
                     fileName = "crop/picture/";
@@ -145,6 +193,7 @@ public class ImageController {
                     break;
                 case 33:
                     fileName = "pest/pestpic/";
+                    break;
                 case 34:
                     fileName = "crop/disease/";
                     break;
@@ -174,6 +223,14 @@ public class ImageController {
                     break;
                 case 45:
                     fileName = "product/specification/";
+                    break;
+                //二维码溯源图片上传
+                case 46:
+                    fileName = "product/speccomment/";
+                    break;
+                //用药图文图片上传
+                case 47:
+                    fileName = "product/specarticle/";
                     break;
                 /*************文章部门********/
                 // 8：文章主图片
@@ -265,6 +322,7 @@ public class ImageController {
                 case 44:
                     fileName = "product/standard/";
                     break;
+
                 default:
                     return result;
             }

@@ -28,8 +28,8 @@ zuul:
             path: /social-service/**
             serviceId: SOCIAL-SERVICE
         weixin-service:
-                    path: /weixin-service/**
-                    serviceId: WEIXIN-SERVICE
+            path: /weixin-service/**
+            serviceId: WEIXIN-SERVICE
 hystrix:
     command:
         default:
