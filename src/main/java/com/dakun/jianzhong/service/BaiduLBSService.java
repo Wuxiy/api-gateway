@@ -110,9 +110,12 @@ public class BaiduLBSService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<MultiValueMap<String, String>> req = new HttpEntity<MultiValueMap<String, String>>(null,headers);
         HttpEntity<String> res=restTemplate.exchange(URL,HttpMethod.GET,req,String.class);
-        JSONObject json =  JSONObject.parseObject(res.getBody());
-        if(json.getInteger("status") == 0) {
-            return json.getJSONObject("result").getJSONObject("location");
+        if(res.getBody() != null){
+            try{
+                return JSONObject.parseObject(res.getBody());
+            }catch(Exception e){
+                return null;
+            }
         }
         return null;
     }
