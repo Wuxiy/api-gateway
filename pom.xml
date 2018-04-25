@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.dakun.jianzhong</groupId>
             <artifactId>service-common</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.dakun.jianzhong.service.BaiduLBSService;
 import com.dakun.jianzhong.utils.Result;
 import com.dakun.jianzhong.utils.ResultGenerator;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.dakun.jianzhong.utils.ServerUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -43,5 +41,10 @@ public class MapController {
          Double latitude = Double.parseDouble(params.get("latitude").toString());
          String title = (String)params.get("title");
         return ResultGenerator.genSuccessResult(baiduLBSService.createQALBSLocation(longitude,latitude,title));
+    }
+    @GetMapping("/getTimeZone")
+    public Result getTimeZone(@RequestParam(required = true,name="longitude") Double longitude,
+                              @RequestParam(required = true,name="latitude") Double latitude){
+        return ResultGenerator.genSuccessResult(baiduLBSService.getTimeZone(longitude,latitude));
     }
 }

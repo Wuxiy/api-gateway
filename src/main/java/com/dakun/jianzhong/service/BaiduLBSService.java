@@ -14,7 +14,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Created by wangh09 on 2017/9/11.
@@ -92,4 +95,26 @@ public class BaiduLBSService {
         }
         return null;
     }
+
+    public JSONObject getTimeZone(Double longitude,Double latitude){
+        //当前绝对时间（秒）
+        long curSec = System.currentTimeMillis()/1000;
+        String URL= ServerUtils.BAIDU_LBS_TIMEZONE+"?coord_type=ctype&location=lat,lng&timestamp=ts&ak=key";
+        URL = URL.replace("ctype","bd09ll")
+           .replace("lat",String.valueOf(latitude))
+           .replace("lng",String.valueOf(longitude))
+           .replace("ts",String.valueOf(curSec))
+           .replace("key",ServerUtils.BAIDU_AK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, String>> req = new HttpEntity<MultiValueMap<String, String>>(null,headers);
+        HttpEntity<String> res=restTemplate.exchange(URL,HttpMethod.GET,req,String.class);
+        JSONObject json =  JSONObject.parseObject(res.getBody());
+        if(json.getInteger("status") == 0) {
+            return json.getJSONObject("result").getJSONObject("location");
+        }
+        return null;
+    }
+
 }
