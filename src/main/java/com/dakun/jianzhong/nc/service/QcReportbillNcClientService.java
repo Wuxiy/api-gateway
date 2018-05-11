@@ -1,4 +1,5 @@
 package com.dakun.jianzhong.nc.service;
+import com.alibaba.fastjson.JSONArray;
 import com.dakun.jianzhong.nc.config.ApiServiceProperties;
 import com.dakun.jianzhong.nc.model.QcReportbillNc;
 import com.dakun.jianzhong.nc.model.QcReportbillNcVo;
@@ -38,7 +39,7 @@ public class QcReportbillNcClientService {
         return new RestTemplate();
     }
 
-    public HashMap getNC(QcReportbillNcVo qcReportbillNcVo) {
+    public JSONArray getNC(QcReportbillNcVo qcReportbillNcVo) {
 
             if (qcReportbillNcVo == null) {
                 return null;
@@ -56,16 +57,17 @@ public class QcReportbillNcClientService {
                                     +qcReportbillNcVo.getWorkshopPK()+"&times="
                                     +qcReportbillNcVo.getTimes(),
                             HttpMethod.GET, null, new ParameterizedTypeReference<List<QcReportbillNc>>(){});*/
-        ResponseEntity<HashMap> exchange = restTemplate()
+        ResponseEntity<String> exchange = restTemplate()
                 .exchange(apiUrl + "/reportbill/nc/getNC?createTime="
                                 + qcReportbillNcVo.getCreateTime() + "&code="
                                 + qcReportbillNcVo.getCode() + "&workshopPK="
                                 + qcReportbillNcVo.getWorkshopPK() + "&times="
                                 + qcReportbillNcVo.getTimes(),
-                        HttpMethod.GET, null, HashMap.class);
+                        HttpMethod.GET, null, String.class);
 
         if (exchange.getStatusCode() == HttpStatus.OK) {
-                return exchange.getBody();
+            JSONArray rs = JSONArray.parseArray(exchange.getBody());
+                return rs;
             }
 
             return null;
