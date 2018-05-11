@@ -2,6 +2,7 @@ package com.dakun.jianzhong.nc.service;
 import com.dakun.jianzhong.nc.config.ApiServiceProperties;
 import com.dakun.jianzhong.nc.model.QcReportbillNc;
 import com.dakun.jianzhong.nc.model.QcReportbillNcVo;
+import com.dakun.jianzhong.utils.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -36,7 +38,7 @@ public class QcReportbillNcClientService {
         return new RestTemplate();
     }
 
-    public List getNC(QcReportbillNcVo qcReportbillNcVo) {
+    public HashMap getNC(QcReportbillNcVo qcReportbillNcVo) {
 
             if (qcReportbillNcVo == null) {
                 return null;
@@ -47,15 +49,22 @@ public class QcReportbillNcClientService {
             // exchange支持‘含参数的类型’（即泛型类）作为返回类型，该特性通过‘ParameterizedTypeReference<T>responseType’描述。
             String apiUrl = apiServiceProperties.getUrl();
 
-            ResponseEntity<List<QcReportbillNc>> exchange = restTemplate()
+           /* ResponseEntity<List<QcReportbillNc>> exchange = restTemplate()
                     .exchange(apiUrl+"/reportbill/nc/getNC?createTime="
                                     +qcReportbillNcVo.getCreateTime()+"&code="
                                     +qcReportbillNcVo.getCode()+"&workshopPK="
                                     +qcReportbillNcVo.getWorkshopPK()+"&times="
                                     +qcReportbillNcVo.getTimes(),
-                            HttpMethod.GET, null, new ParameterizedTypeReference<List<QcReportbillNc>>(){});
+                            HttpMethod.GET, null, new ParameterizedTypeReference<List<QcReportbillNc>>(){});*/
+        ResponseEntity<HashMap> exchange = restTemplate()
+                .exchange(apiUrl + "/reportbill/nc/getNC?createTime="
+                                + qcReportbillNcVo.getCreateTime() + "&code="
+                                + qcReportbillNcVo.getCode() + "&workshopPK="
+                                + qcReportbillNcVo.getWorkshopPK() + "&times="
+                                + qcReportbillNcVo.getTimes(),
+                        HttpMethod.GET, null, HashMap.class);
 
-            if (exchange.getStatusCode() == HttpStatus.OK) {
+        if (exchange.getStatusCode() == HttpStatus.OK) {
                 return exchange.getBody();
             }
 
