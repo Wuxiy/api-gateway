@@ -14,3 +14,6 @@ spring:
     redis:
         host: 172.17.226.32
         port: 6379
+#外网连接nc映射
+apiService:
+    url: http://222.209.216.114:3101
