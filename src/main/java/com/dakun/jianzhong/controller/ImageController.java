@@ -232,6 +232,21 @@ public class ImageController {
                 case 47:
                     fileName = "product/specarticle/";
                     break;
+                case 50:
+                    //农事活动：浇水
+                    fileName = "activity/water/";
+                    break;
+                case 51:
+                    //农事活动：施肥
+                    fileName = "activity/fertilize/";
+                    break;
+                case 52:
+                    //农事活动：打药
+                    fileName = "activity/medicine/";
+                case 53:
+                    //农事活动：自定义活动
+                    fileName = "activity/custom/";
+                    break;
                 /*************文章部门********/
                 // 8：文章主图片
                 case 8:
