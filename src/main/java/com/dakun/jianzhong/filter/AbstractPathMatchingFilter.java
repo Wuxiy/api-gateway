@@ -11,6 +11,8 @@ import java.util.Set;
 /**
  * @author wangjie
  * @date 1/18/2018
+ *
+ * zuul前置过滤器
  */
 public abstract class AbstractPathMatchingFilter extends ZuulFilter {
 
