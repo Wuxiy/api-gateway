@@ -125,12 +125,41 @@ public class PostFilter extends ZuulFilter {
                     }
                 }
                 if(is){
-                    //对图片进行处理
+                    //对图片进行处理：结果可能是数组也可能是对象
+                    //整个结果进行匹配，遍历JSONObject对象，根据文件名获取key，更改value。
                     //整个结果进行匹配，遍历JSONArray数组，将结果转换为JSONObject，根据文件名获取key，更改value。
-                    JSONArray array = JSONArray.parseArray(data);
-                    //array数组包含多个jsonObject对象,遍历多个对象
-                    for(int i=0;i<array.size()-1;i++){
-                        JSONObject object = JSON.parseObject(array.get(i).toString());
+                    if(data.contains("[")){
+                        JSONArray array = JSONArray.parseArray(data);
+                        //array数组包含多个jsonObject对象,遍历多个对象
+                        for(int i=0;i<array.size()-1;i++){
+                            JSONObject object = JSON.parseObject(array.get(i).toString());
+                            for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
+                                for (String s : object.keySet()) {//遍历返回结果值
+                                    Object value = object.get(s);
+                                    if (value.toString().contains(str)){//获取对应的key与value
+                                        //logger.info("key1:"+s+"value1:"+object.get(s));
+                                        //获取到了对应的图片路径value
+                                        //根据deviceid做不同处理
+                                        String deviceId = request.getHeader("deviceId");
+                                        if("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)){
+                                            //图片后台做处理
+                                            //统一返回 "http://" + domain + "/" + key 格式
+                                            object.put(s, QiniuFile.getPrivateDownloadUrl(value.toString()));
+                                        }else{
+                                            //app自行处理
+                                        }
+                                        //logger.info("key2:"+s+"value2:"+object.get(s));
+                                    }
+                                }
+                            }
+                            array.set(i,object);
+                        }
+                        //System.out.println("arry:"+array.toString());
+                        responsepic.put("data",array);
+                        ctx.setResponseBody(JSON.toJSONString(responsepic));
+                        System.out.println("data1:"+array.toString());
+                    }else{
+                        JSONObject object = JSONObject.parseObject(data);
                         for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
                             for (String s : object.keySet()) {//遍历返回结果值
                                 Object value = object.get(s);
@@ -150,12 +179,11 @@ public class PostFilter extends ZuulFilter {
                                 }
                             }
                         }
-                        array.set(i,object);
+                        responsepic.put("data",object);
+                        ctx.setResponseBody(JSON.toJSONString(responsepic));
+                        System.out.println("data1:"+object.toString());
                     }
-                    //System.out.println("arry:"+array.toString());
-                    responsepic.put("data",array);
-                    ctx.setResponseBody(JSON.toJSONString(responsepic));
-                    System.out.println("data1:"+array.toString());
+
                 }else{
                     //System.out.println(ctx.getResponseDataStream());
                     ctx.setResponseBody(JSON.toJSONString(responsepic));//所以重新赋值
