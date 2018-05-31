@@ -142,88 +142,10 @@ public class ImageController {
             Date date = new Date();
             //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");// 小写的mm表示的是分钟
             String localtime = System.currentTimeMillis() + "";
+
+
+
             switch (type) {
-                /**************基本信息部分**************/
-                //0:头像
-                case 0:
-                    fileName = "user/portrait/";
-                    break;
-
-                /**************专家部分**************/
-                //1：身份证正面；2：身份证背面；3：证件
-                case 1:
-                    fileName = "expert/idfront/";
-                    break;
-                case 2:
-                    fileName = "expert/idback/";
-                    break;
-                case 3:
-                    fileName = "expert/credential/";
-                    break;
-
-                /**************经销商部分**************/
-                //4：身份证正面；5：身份证背面；6：营业执照；7：店铺照片
-                case 4:
-                    fileName = "dealer/idfront/";
-                    break;
-                case 5:
-                    fileName = "dealer/idback/";
-                    break;
-                case 6:
-                    fileName = "dealer/lisense/";
-                    break;
-                case 7:
-                    fileName = "dealer/shopphoto/";
-                    break;
-
-                /************作物部分*****************/
-                /**
-                 *30:作物图片,31:作物种类图片,32:虫害图片,33：虫害虫态图片
-                 *34：病害图片,35：缺素症图片，36：生物协迫图片
-                 * 37：草害图片,46:评论图片
-                 */
-                case 30:
-                    fileName = "crop/picture/";
-                    break;
-                case 31:
-                    fileName = "crop/catalog/picture/";
-                    break;
-                case 32:
-                    fileName = "pest/harmpic/";
-                    break;
-                case 33:
-                    fileName = "pest/pestpic/";
-                    break;
-                case 34:
-                    fileName = "crop/disease/";
-                    break;
-                case 35:
-                    fileName = "crop/deficiency/";
-                    break;
-                case 36:
-                    fileName = "crop/threat/";
-                    break;
-                case 37:
-                    fileName = "crop/grass/";
-                    break;
-                case 40:
-                    fileName = "product/product/";
-                    break;
-                case 41:
-                    fileName = "product/trademark/";
-                    break;
-                case 42:
-                    fileName = "product/license/";
-                    break;
-                case 43:
-                    fileName = "product/approve/";
-                    break;
-                case 44:
-                    fileName = "product/standard/";
-                    break;
-                case 45:
-                    fileName = "product/specification/";
-                    break;
                 //二维码溯源图片上传
                 case 46:
                     fileName = "product/speccomment/";
@@ -232,51 +154,12 @@ public class ImageController {
                 case 47:
                     fileName = "product/specarticle/";
                     break;
-                case 50:
-                    //农事活动：浇水
-                    fileName = "activity/water/";
-                    break;
-                case 51:
-                    //农事活动：施肥
-                    fileName = "activity/fertilize/";
-                    break;
-                case 52:
-                    //农事活动：打药
-                    fileName = "activity/medicine/";
-                case 53:
-                    //农事活动：自定义活动
-                    fileName = "activity/custom/";
-                    break;
-                /*************文章部门********/
-                // 8：文章主图片
-                case 8:
-                    fileName = "article/mainpic/";
-                    break;
-                //文章段落图片
-                case 80:
-                    fileName = "article/detail-pic/";
-                    break;
-                //文章html文件
-                case 81:
-                    fileName = "article/richtxt/";
-                    break;
-                case 9:
-                    fileName = "question/detail-pic/";
-                    break;
-                case 10:
-                    //示范产品图片
-                    fileName = "example/product/";
-                    break;
-                case 101:
-                    //使用前图片
-                    fileName = "example/before/";
-                    break;
-                case 102:
-                    //使用后图片
-                    fileName = "example/after/";
-                    break;
                 default:
-                    return result;
+                    fileName = QiniuConstant.pictureMap.get(type);
+                    if(fileName==null){
+                        return result;
+                    }
+                    break;
             }
             fileName += MD5.getMD5String(localtime + key);
             result.put("key", fileName);

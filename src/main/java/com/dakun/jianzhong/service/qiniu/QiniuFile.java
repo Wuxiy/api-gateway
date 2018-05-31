@@ -126,6 +126,11 @@ public class QiniuFile {
 		return downloadUrl;
 	}
 
+	public static String getPrivateDownloadUrl(String baseUrl){
+		String downloadUrl = "";
+		downloadUrl = auth.privateDownloadUrl(baseUrl,QiniuConstant.portrait_download_webpage_exp);
+		return downloadUrl;
+	}
 	/**
 	 * 获取公共下载地址
 	 * @param domain
