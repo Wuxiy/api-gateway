@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,14 +48,16 @@ public class PostFilter extends ZuulFilter {
     public boolean shouldFilter() {
         return true;
     }
-    public static void main (String[] a){
+
+    public static void main(String[] a) {
 
         try {
-            System.out.println(JWTUtils.createJWT("69","{\""+"role\":"+"3"+",\"deviceId\":\""+"000000006094d46b3b066c04147987e1"+"\"}", -1));
+            System.out.println(JWTUtils.createJWT("69", "{\"" + "role\":" + "3" + ",\"deviceId\":\"" + "000000006094d46b3b066c04147987e1" + "\"}", -1));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @Override
     public Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -64,7 +67,7 @@ public class PostFilter extends ZuulFilter {
             if ("/account-service/user/login".equals(uri) || "/account-service/user/mobile/login".equals(uri)) {
                 if (ctx.getResponseStatusCode() == 200) {
                     try (final InputStream responseDataStream = ctx.getResponseDataStream()) {
-                        Map<String,Object> response = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")),Map.class);
+                        Map<String, Object> response = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")), Map.class);
                         if ((Integer) response.get("status") == 200) {
                             Map<String, Object> account = (Map<String, Object>) response.get("data");
                             String deviceId = request.getParameter("deviceId");
@@ -72,11 +75,14 @@ public class PostFilter extends ZuulFilter {
                             Integer id = (Integer) account.get("id");
                             String idStr = String.valueOf(id);
                             if (id == null) idStr = "wrong";
-                            String jwt = JWTUtils.createJWT(idStr,"{\""+"role\":"+role+",\"deviceId\":\""+deviceId+"\"}", -1);
+                            String jwt = JWTUtils.createJWT(idStr, "{\"" + "role\":" + role + ",\"deviceId\":\"" + deviceId + "\"}", -1);
                             //  ctx.addZuulResponseHeader("Access-Token",jwt);
                             response.put("accessToken", jwt);
                         }
-                        ctx.setResponseBody(JSON.toJSONString(response));
+                        //防止数据本身过大导致缓存不够用
+                        InputStream rs = new ByteArrayInputStream(JSON.toJSONString(response).getBytes());
+                        ctx.setResponseDataStream(rs);
+                        //ctx.setResponseBody(JSON.toJSONString(response));
                     } catch (IOException e) {
                         JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"签名失败\"}");
                         ctx.setResponseBody(jb.toString());
@@ -85,21 +91,23 @@ public class PostFilter extends ZuulFilter {
                     return null;
                 }
                 return null;
-            }else  if ("/account-service/admin/login".equals(uri)) {
+            } else if ("/account-service/admin/login".equals(uri)) {
                 if (ctx.getResponseStatusCode() == 200) {
                     try (final InputStream responseDataStream = ctx.getResponseDataStream()) {
-                        Map<String,Object> response = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")),Map.class);
+                        Map<String, Object> response = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")), Map.class);
                         if ((Integer) response.get("status") == 200) {
                             Map<String, Object> admin = (Map<String, Object>) response.get("data");
                             //暂时无角色划分
-                            Integer role = (Integer)admin.get("roleId");
+                            Integer role = (Integer) admin.get("roleId");
                             Integer id = (Integer) admin.get("id");
                             String idStr = String.valueOf(id);
                             if (id == null) idStr = "wrong";
-                            String jwt = JWTUtils.createJWT(idStr,"{\""+"role\":"+role+",\"deviceId\":\"websource\"}", -1);
+                            String jwt = JWTUtils.createJWT(idStr, "{\"" + "role\":" + role + ",\"deviceId\":\"websource\"}", -1);
                             response.put("accessToken", jwt);
                         }
-                        ctx.setResponseBody(JSON.toJSONString(response));
+                        InputStream rs = new ByteArrayInputStream(JSON.toJSONString(response).getBytes());
+                        ctx.setResponseDataStream(rs);
+                        //ctx.setResponseBody(JSON.toJSONString(response));
                     } catch (IOException e) {
                         JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"签名失败!\"}");
                         ctx.setResponseBody(jb.toString());
@@ -111,82 +119,89 @@ public class PostFilter extends ZuulFilter {
             }
             //图片处理
             try {
-                 InputStream responseDataStream = ctx.getResponseDataStream();//会导致ctx.getResponseBody()值为空。客户端接收不到返回值。
+                InputStream responseDataStream = ctx.getResponseDataStream();//会导致输入流不可复用。客户端接收不到返回值。
                 // System.out.println(responseDataStream);
-                Map<String,Object> responsepic = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")),Map.class);
+                Map<String, Object> responsepic = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")), Map.class);
                 String data = responsepic.get("data").toString();
-                System.out.println("data:"+data);
+                System.out.println("data:" + data);
 
                 Boolean is = false;
                 for (String str : QiniuConstant.pictureMap.values()) {
-                    if(data.contains(str)){
-                        is = true ;
+                    if (data.contains(str)) {
+                        is = true;
                         break;
                     }
                 }
-                if(is){
+                if (is) {
                     //对图片进行处理：结果可能是数组也可能是对象
                     //整个结果进行匹配，遍历JSONObject对象，根据文件名获取key，更改value。
                     //整个结果进行匹配，遍历JSONArray数组，将结果转换为JSONObject，根据文件名获取key，更改value。
-                    if(data.contains("[")){
+                    if (data.contains("[")) {
                         JSONArray array = JSONArray.parseArray(data);
                         //array数组包含多个jsonObject对象,遍历多个对象
-                        for(int i=0;i<array.size()-1;i++){
+                        for (int i = 0; i < array.size() - 1; i++) {
                             JSONObject object = JSON.parseObject(array.get(i).toString());
                             for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
                                 for (String s : object.keySet()) {//遍历返回结果值
                                     Object value = object.get(s);
-                                    if (value.toString().contains(str)){//获取对应的key与value
+                                    if (value.toString().contains(str)) {//获取对应的key与value
                                         //logger.info("key1:"+s+"value1:"+object.get(s));
                                         //获取到了对应的图片路径value
                                         //根据deviceid做不同处理
                                         String deviceId = request.getHeader("deviceId");
-                                        if("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)){
+                                        if ("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)) {
                                             //图片后台做处理
                                             //统一返回 "http://" + domain + "/" + key 格式
                                             object.put(s, QiniuFile.getPrivateDownloadUrl(value.toString()));
-                                        }else{
+                                        } else {
                                             //app自行处理
                                         }
                                         //logger.info("key2:"+s+"value2:"+object.get(s));
                                     }
                                 }
                             }
-                            array.set(i,object);
+                            array.set(i, object);
                         }
                         //System.out.println("arry:"+array.toString());
-                        responsepic.put("data",array);
-                        ctx.setResponseBody(JSON.toJSONString(responsepic));
-                        System.out.println("data1:"+array.toString());
-                    }else{
+                        responsepic.put("data", array);
+                        //ctx.setResponseBody(JSON.toJSONString(responsepic));
+                        InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                        ctx.setResponseDataStream(rs);
+                        System.out.println("data1:" + array.toString());
+                    } else {
                         JSONObject object = JSONObject.parseObject(data);
                         for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
                             for (String s : object.keySet()) {//遍历返回结果值
                                 Object value = object.get(s);
-                                if (value.toString().contains(str)){//获取对应的key与value
+                                if (value.toString().contains(str)) {//获取对应的key与value
                                     //logger.info("key1:"+s+"value1:"+object.get(s));
                                     //获取到了对应的图片路径value
                                     //根据deviceid做不同处理
                                     String deviceId = request.getHeader("deviceId");
-                                    if("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)){
+                                    if ("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)) {
                                         //图片后台做处理
                                         //统一返回 "http://" + domain + "/" + key 格式
                                         object.put(s, QiniuFile.getPrivateDownloadUrl(value.toString()));
-                                    }else{
+                                    } else {
                                         //app自行处理
                                     }
                                     //logger.info("key2:"+s+"value2:"+object.get(s));
                                 }
                             }
                         }
-                        responsepic.put("data",object);
-                        ctx.setResponseBody(JSON.toJSONString(responsepic));
-                        System.out.println("data1:"+object.toString());
+                        responsepic.put("data", object);
+                        //ctx.setResponseBody(JSON.toJSONString(responsepic));
+                        InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                        ctx.setResponseDataStream(rs);
+                        System.out.println("data1:" + object.toString());
                     }
 
-                }else{
+                } else {
                     //System.out.println(ctx.getResponseDataStream());
-                    ctx.setResponseBody(JSON.toJSONString(responsepic));//所以重新赋值
+                    // ctx.setResponseBody(JSON.toJSONString(responsepic));
+                    // 所以重新创建流并通过ctx对象传递流
+                    InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                    ctx.setResponseDataStream(rs);
                 }
             } catch (IOException e) {
                 JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"签名失败!\"}");
