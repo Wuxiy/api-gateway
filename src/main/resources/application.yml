@@ -1,5 +1,7 @@
 server:
     port: 2911
+    tomcat:
+      maxHttpHeaderSize: 10MB
 spring:
     application:
         name: api-gateway
@@ -7,6 +9,8 @@ spring:
         multipart:
             max-file-size: 20MB
             max-request-size: 20MB
+
+
 zuul:
     host:
         connect-timeout-millis: 60000
