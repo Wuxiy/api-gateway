@@ -136,7 +136,7 @@ public class PostFilter extends ZuulFilter {
                     //对图片进行处理：结果可能是数组也可能是对象
                     //整个结果进行匹配，遍历JSONObject对象，根据文件名获取key，更改value。
                     //整个结果进行匹配，遍历JSONArray数组，将结果转换为JSONObject，根据文件名获取key，更改value。
-                    if (data.contains("[")) {
+                    if (data.startsWith("[")) {
                         JSONArray array = JSONArray.parseArray(data);
                         //array数组包含多个jsonObject对象,遍历多个对象
                         for (int i = 0; i < array.size() - 1; i++) {
