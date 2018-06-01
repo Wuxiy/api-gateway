@@ -61,9 +61,9 @@ public class QiniuConstant{
 
         pictureMap.put(40,"product/product/");
         pictureMap.put(41,"product/trademark/");
-        pictureMap.put(42,"product/license/");
-        pictureMap.put(43,"product/approve/");
-        pictureMap.put(44,"product/standard/");
+        //pictureMap.put(42,"product/license/");
+        //pictureMap.put(43,"product/approve/");
+        //pictureMap.put(44,"product/standard/");
 
         //pictureMap.put(45,"product/specification/");
         //需要特殊处理的两个文件路径,web端图片大小的压缩

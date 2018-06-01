@@ -1,7 +1,6 @@
 server:
     port: 2911
-    tomcat:
-      maxHttpHeaderSize: 10MB
+
 spring:
     application:
         name: api-gateway
