@@ -150,9 +150,15 @@ public class PostFilter extends ZuulFilter {
                                         //根据deviceid做不同处理
                                         String deviceId = request.getHeader("deviceId");
                                         if ("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)) {
+                                            //value可能是一个图片数组
+                                            StringBuilder stringBuilder = new StringBuilder();
+                                            String[] imageFileNames = value.toString().split(";");
+                                            for (String image : imageFileNames) {
+                                                stringBuilder.append(QiniuFile.getPrivateDownloadUrl(image)).append(";");
+                                            }
                                             //图片后台做处理
                                             //统一返回 "http://" + domain + "/" + key 格式
-                                            object.put(s, QiniuFile.getPrivateDownloadUrl(value.toString()));
+                                            object.put(s, stringBuilder);
                                         } else {
                                             //app自行处理
                                         }
@@ -179,9 +185,15 @@ public class PostFilter extends ZuulFilter {
                                     //根据deviceid做不同处理
                                     String deviceId = request.getHeader("deviceId");
                                     if ("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)) {
+                                        //value可能是一个图片数组
+                                        StringBuilder stringBuilder = new StringBuilder();
+                                        String[] imageFileNames = value.toString().split(";");
+                                        for (String image : imageFileNames) {
+                                            stringBuilder.append(QiniuFile.getPrivateDownloadUrl(image)).append(";");
+                                        }
                                         //图片后台做处理
                                         //统一返回 "http://" + domain + "/" + key 格式
-                                        object.put(s, QiniuFile.getPrivateDownloadUrl(value.toString()));
+                                        object.put(s, stringBuilder);
                                     } else {
                                         //app自行处理
                                     }
