@@ -163,13 +163,17 @@ public class PostFilter extends ZuulFilter {
                             ctx.setResponseDataStream(rs);
                             System.out.println("data1:" + object.toString());
                         }
+                    } else {
+                        // 所以重新创建流并通过ctx对象传递流
+                        InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                        ctx.setResponseDataStream(rs);
                     }
-                } else {
+                }else {
+                    //app自行处理
                     // 所以重新创建流并通过ctx对象传递流
                     InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
                     ctx.setResponseDataStream(rs);
                 }
-                //app自行处理
             } catch (IOException e) {
                 JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"业务方法获取数据失败!\"}");
                 ctx.setResponseBody(jb.toString());
