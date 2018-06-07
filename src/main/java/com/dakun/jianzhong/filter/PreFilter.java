@@ -2,6 +2,7 @@ package com.dakun.jianzhong.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.dakun.jianzhong.controller.MicroserviceApiController;
 import com.dakun.jianzhong.utils.JWTUtils;
 import com.dakun.jianzhong.utils.ServerUtils;
 import com.dakun.jianzhong.utils.TextUtils;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,9 @@ public class PreFilter extends AbstractPathMatchingFilter {
     private RestTemplate restTemplate;
 
     private RedisTemplate redisTemplate;
+
+    @Resource
+    private MicroserviceApiController microserviceApiController;
 
     @Autowired(required = false)
     public void setRedisTemplate(StringRedisTemplate stringRedisTemplate) {
@@ -85,7 +90,7 @@ public class PreFilter extends AbstractPathMatchingFilter {
                 return null;
             }
             //*************************************处理权限
-            HttpHeaders headers = new HttpHeaders();
+            /*HttpHeaders headers = new HttpHeaders();
             headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
             HttpEntity<?> entity = new HttpEntity<>(headers);
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(ServerUtils.API_LIST_URL)
@@ -99,9 +104,10 @@ public class PreFilter extends AbstractPathMatchingFilter {
 
             Map<String, Object> res = response.getBody();
             List<Map<String, Object>> data = (List<Map<String, Object>>) res.get("data");
-
+*/
+            String apiMap = microserviceApiController.getApiMap(uri);
             //API 不存在
-            if (data.size() < 1) {
+            if (apiMap == null) {
                 ctx.setSendZuulResponse(false);
                 ctx.setResponseStatusCode(404);
                 Map<String, Object> result = new HashMap<String, Object>();
@@ -111,7 +117,7 @@ public class PreFilter extends AbstractPathMatchingFilter {
                 ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
             } else {
                 //API 存在，而且不公开
-                if (!(Boolean) data.get(0).get("isPublic")) {
+                if ("true".equals(apiMap)) {
                     String jwt = getToken(request);
                     //没有jwt
                     if (jwt == null) {
