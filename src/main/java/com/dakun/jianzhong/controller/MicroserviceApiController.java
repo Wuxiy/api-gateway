@@ -2,7 +2,6 @@ package com.dakun.jianzhong.controller;
 
 import com.dakun.jianzhong.utils.Result;
 import com.dakun.jianzhong.utils.ResultGenerator;
-import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,6 +26,7 @@ public class MicroserviceApiController {
     private StringRedisTemplate redisTemplate;
 
     ValueOperations<String,String> valueOperations;
+    //构造方法注入
     MicroserviceApiController(StringRedisTemplate redisTemplate){
         this.redisTemplate = redisTemplate;
         valueOperations = redisTemplate.opsForValue();
