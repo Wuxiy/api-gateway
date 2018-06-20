@@ -125,7 +125,14 @@ public class PostFilter extends ZuulFilter {
             try {
                 InputStream responseDataStream = ctx.getResponseDataStream();//会导致输入流不可复用。客户端接收不到返回值。
                 // System.out.println(responseDataStream);
-                Map<String, Object> responsepic = JSON.parseObject(CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8")), Map.class);
+                String s = CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8"));
+                //针对返回结果不是map的数据
+                if(!s.contains("{")){
+                    InputStream rs = new ByteArrayInputStream(s.getBytes());
+                    ctx.setResponseDataStream(rs);
+                    return null;
+                }
+                Map<String, Object> responsepic = JSON.parseObject(s, Map.class);
                 String data = responsepic.get("data").toString();
                 System.out.println("data:" + data);
 
