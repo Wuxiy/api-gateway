@@ -240,20 +240,22 @@ public class PostFilter extends ZuulFilter {
     }
 
     //对包含图片的数据进行包装
-    public JSON buildObj(Object object, String str) {
+    public Object buildObj(Object object, String str) {
         //Map<String, Object> map = BeanUtils.beanProperties(object);不能用BeanUtils方法
         String s = object.toString();
         if (s.startsWith("[")) {
             JSONArray arry = JSONArray.parseArray(s);
-            for (int i = 0; i <= arry.size() - 1; i++) {
-                JSONObject arrayObj = JSON.parseObject(arry.get(i).toString());
-                arry.set(i, ObjectToMap(arrayObj, str));
+            for (int i = 0; i <arry.size(); i++) {
+                if(arry.get(i).toString().contains(str)){
+                    JSONObject arrayObj = JSON.parseObject(arry.get(i).toString());
+                    arry.set(i, ObjectToMap(arrayObj, str));
+                }
             }
             return arry;
         } else {
             //对象
             JSONObject object1 = JSON.parseObject(s);
-            return JSON.parseObject(ObjectToMap(object1, str).toString());
+            return object1;
         }
     }
 }

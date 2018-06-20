@@ -38,7 +38,7 @@ public class MicroserviceApiController {
         //this.apiMap.putAll(params);
         Set<Map.Entry<String, Object>> entries = params.entrySet();
         for (Map.Entry<String, Object> entry : entries) {
-            valueOperations.set(entry.getKey(),entry.getValue().toString(),1, TimeUnit.HOURS);
+            valueOperations.set(entry.getKey(),entry.getValue().toString(),10, TimeUnit.DAYS);
         }
         return ResultGenerator.genSuccessResult();
     }
