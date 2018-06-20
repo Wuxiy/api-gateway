@@ -174,8 +174,8 @@ public class PostFilter extends ZuulFilter {
                     InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
                     ctx.setResponseDataStream(rs);
                 }
-            } catch (IOException e) {
-                JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"业务方法获取数据失败!\"}");
+            } catch (Exception e) {
+                JSON jb = JSON.parseObject("{\"status\":210,\"message\":\"业务方法传递数据失败!\"}");
                 ctx.setResponseBody(jb.toString());
                 e.printStackTrace();
             }
