@@ -123,6 +123,9 @@ public class PostFilter extends ZuulFilter {
             }
             //图片处理
             try {
+                //responseBody一直为空
+                /*Object responseBody = ctx.get("responseBody");
+                responseBody.toString();*/
                 InputStream responseDataStream = ctx.getResponseDataStream();//会导致输入流不可复用。客户端接收不到返回值。
                 // System.out.println(responseDataStream);
                 String s = CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8"));
@@ -133,7 +136,14 @@ public class PostFilter extends ZuulFilter {
                     return null;
                 }
                 Map<String, Object> responsepic = JSON.parseObject(s, Map.class);
-                String data = responsepic.get("data").toString();
+                //针对返回结果data数据为空的处理
+                Object data1 = responsepic.get("data");
+                if(data1==null){
+                    InputStream rs = new ByteArrayInputStream(s.getBytes());
+                    ctx.setResponseDataStream(rs);
+                    return null;
+                }
+                String data = data1.toString();
                 System.out.println("data:" + data);
 
                 String deviceId = request.getHeader("deviceId");
