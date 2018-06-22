@@ -272,6 +272,17 @@ public class PostFilter extends ZuulFilter {
         } else {
             //对象
             JSONObject object1 = JSON.parseObject(s);
+            for (Map.Entry<String, Object> entry : object1.entrySet()) {
+                String s1 = entry.getValue().toString();
+                if(s1.contains("{")){
+                    buildObj(entry.getValue(),str);
+                }else {
+                    if(s1.contains(str)){
+                        entry.setValue(ImageToUrl(s1));
+                    }
+                }
+
+            }
             return object1;
         }
     }
