@@ -3,6 +3,7 @@ package com.dakun.jianzhong.nc.controller;
 import com.dakun.jianzhong.nc.model.QcReportbillNc;
 import com.dakun.jianzhong.nc.model.QcReportbillNcVo;
 import com.dakun.jianzhong.nc.service.QcReportbillNcClientService;
+import com.dakun.jianzhong.utils.IsPublic;
 import com.dakun.jianzhong.utils.Result;
 import com.dakun.jianzhong.utils.ResultGenerator;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ public class ConnectionNcController {
     private QcReportbillNcClientService qcReportbillNcClientService;
 
     @GetMapping("/getNCdata")
+    @IsPublic
     public Result getNC(@RequestParam Map<String,Object> params){
         QcReportbillNcVo qcReportbillNcVo = new QcReportbillNcVo();
         qcReportbillNcVo.setCreateTime((String) params.get("createTime"));
