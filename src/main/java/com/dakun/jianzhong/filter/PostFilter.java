@@ -3,6 +3,7 @@ package com.dakun.jianzhong.filter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dakun.jianzhong.service.qiniu.QiniuConstant;
 import com.dakun.jianzhong.service.qiniu.QiniuFile;
 import com.dakun.jianzhong.utils.BeanUtils;
@@ -123,9 +124,6 @@ public class PostFilter extends ZuulFilter {
             }
             //图片处理
             try {
-                //responseBody一直为空
-                /*Object responseBody = ctx.get("responseBody");
-                responseBody.toString();*/
                 InputStream responseDataStream = ctx.getResponseDataStream();//会导致输入流不可复用。客户端接收不到返回值。
                 // System.out.println(responseDataStream);
                 String s = CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8"));
@@ -143,7 +141,8 @@ public class PostFilter extends ZuulFilter {
                     ctx.setResponseDataStream(rs);
                     return null;
                 }
-                String data = data1.toString();
+                //避免对象为null时，被忽略属性
+                String data = JSON.toJSONString(data1, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty);
                 System.out.println("data:" + data);
 
                 String deviceId = request.getHeader("deviceId");
@@ -169,26 +168,26 @@ public class PostFilter extends ZuulFilter {
                             //System.out.println("arry:"+array.toString());
                             responsepic.put("data", array);
                             //ctx.setResponseBody(JSON.toJSONString(responsepic));
-                            InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                            InputStream rs = new ByteArrayInputStream(objectToString(responsepic).getBytes());
                             ctx.setResponseDataStream(rs);
                             System.out.println("data1:" + array.toString());
                         } else {
                             JSONObject object = setImageUrl(data);
                             responsepic.put("data", object);
                             //ctx.setResponseBody(JSON.toJSONString(responsepic));
-                            InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                            InputStream rs = new ByteArrayInputStream(objectToString(responsepic).getBytes());
                             ctx.setResponseDataStream(rs);
                             System.out.println("data1:" + object.toString());
                         }
                     } else {
                         // 所以重新创建流并通过ctx对象传递流
-                        InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                        InputStream rs = new ByteArrayInputStream(objectToString(responsepic).getBytes());
                         ctx.setResponseDataStream(rs);
                     }
                 }else {
                     //app自行处理
                     // 所以重新创建流并通过ctx对象传递流
-                    InputStream rs = new ByteArrayInputStream(JSON.toJSONString(responsepic).getBytes());
+                    InputStream rs = new ByteArrayInputStream(objectToString(responsepic).getBytes());
                     ctx.setResponseDataStream(rs);
                 }
             } catch (Exception e) {
@@ -205,22 +204,29 @@ public class PostFilter extends ZuulFilter {
         }
     }
 
-    //对value遍历处理
+    /**
+     * 对value进行遍历处理
+     * @param data
+     * @return
+     */
     public JSONObject setImageUrl(String data) {
         JSONObject object = JSONObject.parseObject(data);
         for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
             for (String s : object.keySet()) {//遍历返回结果值
                 Object value = object.get(s);
-                if (value.toString().contains(str)) {//获取对应的key与value
-                    if (value.toString().contains("{")) {
-                        //value是其他对象
-                        object.put(s, buildObj(value, str));
-                    } else {
-                        //获取到了对应的图片路径value
-                        //value可能是一个图片数组
-                        //图片后台做处理
-                        //统一返回 "http://" + domain + "/" + key 格式
-                        object.put(s, ImageToUrl(value.toString()));
+                //存在value为空的情况
+                if(value!= null){
+                    if (value.toString().contains(str)) {//获取对应的key与value
+                        if (value.toString().contains("{")) {
+                            //value包含对象
+                            object.put(s, buildObj(value, str));
+                        } else {
+                            //获取到了对应的图片路径value
+                            //value可能是一个图片数组
+                            //图片后台做处理
+                            //统一返回 "http://" + domain + "/" + key 格式
+                            object.put(s, ImageToUrl(value.toString()));
+                        }
                     }
                 }
             }
@@ -240,8 +246,6 @@ public class PostFilter extends ZuulFilter {
 
     //将object对象转换为map包装图片地址
     public Map<String, Object> ObjectToMap(Map<String, Object> map, String str) {
-        //Map<String, Object> map = BeanUtils.beanProperties(obj);
-        //JSONObject map = JSONObject.parseObject(obj.toString());
         Map<String, Object> resultMap = new HashMap<String, Object>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if(entry.getValue().toString().contains("[")){
@@ -258,32 +262,28 @@ public class PostFilter extends ZuulFilter {
 
     //对包含图片的数据进行包装
     public Object buildObj(Object object, String str) {
-        //Map<String, Object> map = BeanUtils.beanProperties(object);不能用BeanUtils方法
-        String s = object.toString();
+        //对象解析成最小单位
+        String s = objectToString(object);
         if (s.startsWith("[")) {
             JSONArray arry = JSONArray.parseArray(s);
             for (int i = 0; i <arry.size(); i++) {
                 if(arry.get(i).toString().contains(str)){
-                    JSONObject arrayObj = JSON.parseObject(arry.get(i).toString());
-                    arry.set(i, ObjectToMap(arrayObj, str));
+                    arry.set(i,setImageUrl(objectToString(arry.get(i))));
                 }
             }
             return arry;
         } else {
-            //对象
+            //对象直接遍历
             JSONObject object1 = JSON.parseObject(s);
             for (Map.Entry<String, Object> entry : object1.entrySet()) {
-                String s1 = entry.getValue().toString();
-                if(s1.contains("{")){
-                    buildObj(entry.getValue(),str);
-                }else {
-                    if(s1.contains(str)){
-                        entry.setValue(ImageToUrl(s1));
-                    }
-                }
-
+                entry.setValue(setImageUrl(objectToString(entry.getValue())));
             }
             return object1;
         }
+    }
+
+    //object 不能强转JSONObject ,转为String
+    public String objectToString(Object object){
+        return JSON.toJSONString(object, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty);
     }
 }
