@@ -133,17 +133,26 @@ public class PostFilter extends ZuulFilter {
                     ctx.setResponseDataStream(rs);
                     return null;
                 }
-                Map<String, Object> responsepic = JSON.parseObject(s, Map.class);
-                //针对返回结果data数据为空的处理
-                Object data1 = responsepic.get("data");
-                if(data1==null){
-                    InputStream rs = new ByteArrayInputStream(s.getBytes());
-                    ctx.setResponseDataStream(rs);
-                    return null;
+                Map<String, Object> responsepic = new HashMap<>();
+                String data = null;
+                //针对业务方法直接返回数组的情况
+                if(s.startsWith("[")){
+                    JSONArray array = JSON.parseObject(s, JSONArray.class);
+                    responsepic.put("data",array);
+                    data = s;
+                }else{
+                    responsepic = JSON.parseObject(s, Map.class);
+                    //针对返回结果data数据为空的处理
+                    Object data1 = responsepic.get("data");
+                    if(data1==null){
+                        InputStream rs = new ByteArrayInputStream(s.getBytes());
+                        ctx.setResponseDataStream(rs);
+                        return null;
+                    }
+                    //避免对象为null时，被忽略属性
+                    data = JSON.toJSONString(data1, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty);
+                    System.out.println("data:" + data);
                 }
-                //避免对象为null时，被忽略属性
-                String data = JSON.toJSONString(data1, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty);
-                System.out.println("data:" + data);
 
                 String deviceId = request.getHeader("deviceId");
                 if ("websource".equals(deviceId) || "0000000062728c586110c7f90033c587".equals(deviceId)) {
