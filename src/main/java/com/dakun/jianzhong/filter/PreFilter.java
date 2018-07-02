@@ -117,7 +117,7 @@ public class PreFilter extends AbstractPathMatchingFilter {
                 ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
             } else {
                 //API 存在，而且不公开
-                if ("true".equals(apiMap)) {
+                if ("false".equals(apiMap)) {
                     String jwt = getToken(request);
                     //没有jwt
                     if (jwt == null) {
