@@ -128,7 +128,7 @@ public class PostFilter extends ZuulFilter {
                 // System.out.println(responseDataStream);
                 String s = CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8"));
                 //针对返回结果不是map的数据
-                if(!s.contains("{")){
+                if(!s.contains("{") || !s.contains("data")){
                     InputStream rs = new ByteArrayInputStream(s.getBytes());
                     ctx.setResponseDataStream(rs);
                     return null;
