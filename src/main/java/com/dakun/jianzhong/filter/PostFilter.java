@@ -292,7 +292,7 @@ public class PostFilter extends ZuulFilter {
             for (Map.Entry<String, Object> entry : object1.entrySet()) {
                 String data = objectToString(entry.getValue());
                 if(data.startsWith("[")){
-                    return buildObj(entry.getValue(),str);
+                    buildObj(entry.getValue(),str);
                 }else if(objectToString(entry.getValue()).contains(str)){
                     if(objectToString(entry.getValue()).contains("{")){
                         entry.setValue(setImageUrl(objectToString(entry.getValue())));
