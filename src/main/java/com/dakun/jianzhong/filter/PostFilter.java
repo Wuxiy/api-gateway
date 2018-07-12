@@ -126,6 +126,9 @@ public class PostFilter extends ZuulFilter {
             try {
                 InputStream responseDataStream = ctx.getResponseDataStream();//会导致输入流不可复用。客户端接收不到返回值。
                 // System.out.println(responseDataStream);
+                if(responseDataStream == null){
+                    return null;
+                }
                 String s = CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8"));
                 //针对返回结果不是map的数据
                 if(!s.contains("{") || !s.contains("data")){
@@ -170,7 +173,7 @@ public class PostFilter extends ZuulFilter {
                         if (data.startsWith("[")) {
                             JSONArray array = JSONArray.parseArray(data);
                             //array数组包含多个jsonObject对象,遍历多个对象
-                            for (int i = 0; i < array.size() - 1; i++) {
+                            for (int i = 0; i <= array.size() - 1; i++) {
                                 JSONObject object = setImageUrl(array.get(i).toString());
                                 array.set(i, object);
                             }
@@ -219,29 +222,44 @@ public class PostFilter extends ZuulFilter {
      * @return
      */
     public JSONObject setImageUrl(String data) {
-        JSONObject object = JSONObject.parseObject(data);
-        for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
-            for (String s : object.keySet()) {//遍历返回结果值
-                Object value = object.get(s);
-                //存在value为空的情况
-                if(value!= null){
-                    if (value.toString().contains(str)) {//获取对应的key与value
-                        if (value.toString().contains("{")) {
-                            //value包含对象
-                            object.put(s, buildObj(value, str));
-                        } else {
-                            //获取到了对应的图片路径value
-                            //value可能是一个图片数组
-                            //图片后台做处理
-                            //统一返回 "http://" + domain + "/" + key 格式
-                            object.put(s, ImageToUrl(value.toString()));
+        if (data.startsWith("[")) {
+            JSONArray array = JSONArray.parseArray(data);
+            //array数组包含多个jsonObject对象,遍历多个对象
+            for (int i = 0; i <=array.size() - 1; i++) {
+                JSONObject object = setImageUrl(array.get(i).toString());
+                array.set(i, object);
+            }
+            //array 去掉[] 返回
+            String data1 = objectToString(array);
+            String substring = data1.substring(1, data1.length()-1);
+            return JSONObject.parseObject(substring);
+        }else{
+            JSONObject object = JSONObject.parseObject(data);
+            for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
+                for (String s : object.keySet()) {//遍历返回结果值
+                    Object value = object.get(s);
+                    //存在value为空的情况
+                    if(value!= null){
+                        if (value.toString().contains(str)) {//获取对应的key与value
+                            if (value.toString().contains("{")) {
+                                //value包含对象
+                                object.put(s, buildObj(value, str));
+                            } else {
+                                //获取到了对应的图片路径value
+                                //value可能是一个图片数组
+                                //图片后台做处理
+                                //统一返回 "http://" + domain + "/" + key 格式
+                                object.put(s, ImageToUrl(value.toString()));
+                            }
                         }
                     }
                 }
             }
+            return object;
         }
-        return object;
     }
+
+
 
     //包装图片地址
     public String ImageToUrl(String str) {
