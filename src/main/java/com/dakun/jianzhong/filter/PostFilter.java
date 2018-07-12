@@ -222,18 +222,6 @@ public class PostFilter extends ZuulFilter {
      * @return
      */
     public JSONObject setImageUrl(String data) {
-        if (data.startsWith("[")) {
-            JSONArray array = JSONArray.parseArray(data);
-            //array数组包含多个jsonObject对象,遍历多个对象
-            for (int i = 0; i <=array.size() - 1; i++) {
-                JSONObject object = setImageUrl(array.get(i).toString());
-                array.set(i, object);
-            }
-            //array 去掉[] 返回
-            String data1 = objectToString(array);
-            String substring = data1.substring(1, data1.length()-1);
-            return JSONObject.parseObject(substring);
-        }else{
             JSONObject object = JSONObject.parseObject(data);
             for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
                 for (String s : object.keySet()) {//遍历返回结果值
@@ -256,7 +244,6 @@ public class PostFilter extends ZuulFilter {
                 }
             }
             return object;
-        }
     }
 
 
@@ -303,7 +290,10 @@ public class PostFilter extends ZuulFilter {
             //对象直接遍历
             JSONObject object1 = JSON.parseObject(s);
             for (Map.Entry<String, Object> entry : object1.entrySet()) {
-                if(objectToString(entry.getValue()).contains(str)){
+                String data = objectToString(entry.getValue());
+                if(data.startsWith("[")){
+                    return buildObj(entry.getValue(),str);
+                }else if(objectToString(entry.getValue()).contains(str)){
                     if(objectToString(entry.getValue()).contains("{")){
                         entry.setValue(setImageUrl(objectToString(entry.getValue())));
                     }else {
