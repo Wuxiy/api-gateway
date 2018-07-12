@@ -11,6 +11,7 @@ import com.dakun.jianzhong.utils.JWTUtils;
 import com.google.common.io.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -126,12 +127,12 @@ public class PostFilter extends ZuulFilter {
             try {
                 InputStream responseDataStream = ctx.getResponseDataStream();//会导致输入流不可复用。客户端接收不到返回值。
                 // System.out.println(responseDataStream);
-                if(responseDataStream == null){
+                if (responseDataStream == null) {
                     return null;
                 }
                 String s = CharStreams.toString(new InputStreamReader(responseDataStream, "UTF-8"));
                 //针对返回结果不是map的数据
-                if(!s.contains("{") || !s.contains("data")){
+                if (!s.contains("{") || !s.contains("data")) {
                     InputStream rs = new ByteArrayInputStream(s.getBytes());
                     ctx.setResponseDataStream(rs);
                     return null;
@@ -139,15 +140,15 @@ public class PostFilter extends ZuulFilter {
                 Map<String, Object> responsepic = new HashMap<>();
                 String data = null;
                 //针对业务方法直接返回数组的情况
-                if(s.startsWith("[")){
+                if (s.startsWith("[")) {
                     JSONArray array = JSON.parseObject(s, JSONArray.class);
-                    responsepic.put("data",array);
+                    responsepic.put("data", array);
                     data = s;
-                }else{
+                } else {
                     responsepic = JSON.parseObject(s, Map.class);
                     //针对返回结果data数据为空的处理
                     Object data1 = responsepic.get("data");
-                    if(data1==null){
+                    if (data1 == null) {
                         InputStream rs = new ByteArrayInputStream(s.getBytes());
                         ctx.setResponseDataStream(rs);
                         return null;
@@ -196,7 +197,7 @@ public class PostFilter extends ZuulFilter {
                         InputStream rs = new ByteArrayInputStream(objectToString(responsepic).getBytes());
                         ctx.setResponseDataStream(rs);
                     }
-                }else {
+                } else {
                     //app自行处理
                     // 所以重新创建流并通过ctx对象传递流
                     InputStream rs = new ByteArrayInputStream(objectToString(responsepic).getBytes());
@@ -218,40 +219,48 @@ public class PostFilter extends ZuulFilter {
 
     /**
      * 对value进行遍历处理
+     *
      * @param data
      * @return
      */
     public JSONObject setImageUrl(String data) {
-            JSONObject object = JSONObject.parseObject(data);
-            for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
-                for (String s : object.keySet()) {//遍历返回结果值
-                    Object value = object.get(s);
-                    //存在value为空的情况
-                    if(value!= null){
-                        if (value.toString().contains(str)) {//获取对应的key与value
-                            if (value.toString().contains("{")) {
-                                //value包含对象
-                                object.put(s, buildObj(value, str));
+        JSONObject object = JSONObject.parseObject(data);
+        for (String str : QiniuConstant.pictureMap.values()) {//遍历map值
+            for (String s : object.keySet()) {//遍历返回结果值
+                Object value = object.get(s);
+                //存在value为空的情况
+                if (value != null) {
+                    if (value.toString().contains(str)) {//获取对应的key与value
+                        if (value.toString().contains("{")) {
+                            //value包含对象
+                            object.put(s, buildObj(value, str));
+                        } else {
+                            //获取到了对应的图片路径value
+                            //value可能是一个图片数组
+                            //图片后台做处理
+                            //统一返回 "http://" + domain + "/" + key 格式
+                            if (value.toString().startsWith("[")) {
+                                JSONArray array = JSONArray.parseArray(value.toString());
+                                for (int i = 0; i < array.size(); i++) {
+                                    array.set(i, ImageToUrl(array.get(i).toString()));
+                                }
+                                object.put(s, array);
                             } else {
-                                //获取到了对应的图片路径value
-                                //value可能是一个图片数组
-                                //图片后台做处理
-                                //统一返回 "http://" + domain + "/" + key 格式
                                 object.put(s, ImageToUrl(value.toString()));
                             }
                         }
                     }
                 }
             }
-            return object;
+        }
+        return object;
     }
-
 
 
     //包装图片地址
     public String ImageToUrl(String str) {
         StringBuilder stringBuilder = new StringBuilder();
-        String[] imageFileNames = str.split(";");
+        String[] imageFileNames = str.contains(";") ? str.split(";") : str.split(",");
         for (String image : imageFileNames) {
             stringBuilder.append(QiniuFile.getPrivateDownloadUrl(image)).append(";");
         }
@@ -262,8 +271,8 @@ public class PostFilter extends ZuulFilter {
     public Map<String, Object> ObjectToMap(Map<String, Object> map, String str) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if(entry.getValue().toString().contains("[")){
-                buildObj(entry.getValue(),str);
+            if (entry.getValue().toString().contains("[")) {
+                buildObj(entry.getValue(), str);
             }
             if (entry.getValue().toString().contains(str)) {
                 resultMap.put(entry.getKey(), ImageToUrl(entry.getValue().toString()));
@@ -280,9 +289,9 @@ public class PostFilter extends ZuulFilter {
         String s = objectToString(object);
         if (s.startsWith("[")) {
             JSONArray arry = JSONArray.parseArray(s);
-            for (int i = 0; i <arry.size(); i++) {
-                if(arry.get(i).toString().contains(str)){
-                    arry.set(i,setImageUrl(objectToString(arry.get(i))));
+            for (int i = 0; i < arry.size(); i++) {
+                if (arry.get(i).toString().contains(str)) {
+                    arry.set(i, setImageUrl(objectToString(arry.get(i))));
                 }
             }
             return arry;
@@ -291,12 +300,12 @@ public class PostFilter extends ZuulFilter {
             JSONObject object1 = JSON.parseObject(s);
             for (Map.Entry<String, Object> entry : object1.entrySet()) {
                 String data = objectToString(entry.getValue());
-                if(data.startsWith("[")){
-                    buildObj(entry.getValue(),str);
-                }else if(objectToString(entry.getValue()).contains(str)){
-                    if(objectToString(entry.getValue()).contains("{")){
+                if (data.startsWith("[")) {
+                    entry.setValue(buildObj(entry.getValue(), str));
+                } else if (objectToString(entry.getValue()).contains(str)) {
+                    if (objectToString(entry.getValue()).contains("{")) {
                         entry.setValue(setImageUrl(objectToString(entry.getValue())));
-                    }else {
+                    } else {
                         entry.setValue(ImageToUrl(entry.getValue().toString()));
                     }
                 }
@@ -306,7 +315,7 @@ public class PostFilter extends ZuulFilter {
     }
 
     //object 不能强转JSONObject ,转为String
-    public String objectToString(Object object){
+    public String objectToString(Object object) {
         return JSON.toJSONString(object, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty);
     }
 }
