@@ -96,5 +96,6 @@ public class QiniuConstant{
         //使用后图片
         pictureMap.put(102,"example/after/");
 
+        pictureMap.put(103,"social/banner/");
     }
 }

@@ -167,7 +167,7 @@ public class ImageController {
                     .putNotEmpty("returnBody",
                             "{\"key\": $(key),\"ext\":$(ext),\"exif\":$(exif)}");
             putPolicy.putNotEmpty("persistentOps",
-                    "imageMogr2/thumbnail/800*800");
+                    "imageMogr2/thumbnail/800x800");//限定长边，生成不超过 800x800 的缩略图
             result.put("token", QiniuFile.getuploadtoken(bucket, putPolicy));
         } catch (Exception e) {
             e.printStackTrace();
