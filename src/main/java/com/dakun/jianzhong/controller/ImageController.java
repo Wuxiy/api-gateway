@@ -53,6 +53,19 @@ public class ImageController {
             String baseUrl = QiniuFile.getPublishUrl(domain,key);
             return ResultGenerator.genSuccessResult(baseUrl);
     }
+
+    /**
+     * 获取文章问题视频播放地址
+     * @param domain
+     * @param key
+     * @return
+     */
+    @GetMapping("/getsocialvideourl")
+    public Result getSocialvideourl(@RequestParam String domain ,@RequestParam(required = true) String key) {
+        String getdownloadurl = QiniuFile.getdownloadurl(domain, key,null,QiniuConstant.portrait_download_webpage_exp);
+        return ResultGenerator.genSuccessResult(getdownloadurl);
+    }
+
         //用于网页获取小图片地址
     @GetMapping("/getspicurl")
     public Result getpicurl(@RequestParam(required = true) String bucket, @RequestParam(required = true) String key) {
