@@ -167,6 +167,10 @@ public class ImageController {
                 case 47:
                     fileName = "product/specarticle/";
                     break;
+                //文章html文件
+                case 81 :
+                    fileName = "article/richtxt/";
+                    break;
                 default:
                     fileName = QiniuConstant.pictureMap.get(type);
                     if(fileName==null){

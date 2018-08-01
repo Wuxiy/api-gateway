@@ -87,7 +87,7 @@ public class QiniuConstant{
         //文章段落图片
         pictureMap.put(80,"article/detail-pic/");
         //文章html文件
-        pictureMap.put(81,"article/richtxt/");
+        //pictureMap.put(81,"article/richtxt/");
         pictureMap.put(9,"question/detail-pic/");
         //示范产品图片
         pictureMap.put(10,"example/product/");
