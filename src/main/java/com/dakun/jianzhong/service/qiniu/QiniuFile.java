@@ -128,7 +128,8 @@ public class QiniuFile {
 
 	public static String getPrivateDownloadUrl(String baseUrl){
 		String downloadUrl = "";
-		downloadUrl = auth.privateDownloadUrl(baseUrl,QiniuConstant.portrait_download_webpage_exp);
+		String addkey = "?imageView2/2/w/300";
+		downloadUrl = auth.privateDownloadUrl(baseUrl+addkey,QiniuConstant.portrait_download_webpage_exp);
 		return downloadUrl;
 	}
 	/**
