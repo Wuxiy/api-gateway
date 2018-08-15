@@ -8,6 +8,8 @@ import com.dakun.jianzhong.utils.ServerUtils;
 import com.dakun.jianzhong.utils.TextUtils;
 import com.netflix.zuul.context.RequestContext;
 import io.jsonwebtoken.Claims;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -34,6 +36,8 @@ public class PreFilter extends AbstractPathMatchingFilter {
     private RestTemplate restTemplate;
 
     private RedisTemplate redisTemplate;
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Resource
     private MicroserviceApiController microserviceApiController;
@@ -144,6 +148,7 @@ public class PreFilter extends AbstractPathMatchingFilter {
                                 ctx.addZuulRequestHeader("usertype", object.getString("role"));
                                 String deviceId = object.getString("deviceId");
                                 if (!deviceId.equals(deviceIdParam)) {
+                                    logger.error("deviceId 与 deviceIdParam 不相等");
                                     ctx.setSendZuulResponse(false);
                                     ctx.setResponseStatusCode(402);
                                     Map<String, Object> result = new HashMap<String, Object>();
@@ -178,6 +183,7 @@ public class PreFilter extends AbstractPathMatchingFilter {
     private String getDeviceId(HttpServletRequest request) {
         String deviceId = request.getHeader("deviceId");
         if (StringUtils.isEmpty(deviceId)) {
+            logger.info("request.getHeader(\"deviceId\") 值为空");
             return request.getParameter("deviceId");
         }
         return deviceId;
